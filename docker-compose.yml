@@ -1,0 +1,9 @@
+services:
+  build-optimization-app:
+    image: demo:v3
+    container_name: build-optimization-app
+
+    ports:
+      - "8080:8080"
+
+    restart: unless-stopped
