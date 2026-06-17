@@ -1,0 +1,16 @@
+Version: Dockerfile.v1
+
+Build Strategy:
+- Copy entire project
+- Run Maven build inside container
+
+Observations:
+- Application built twice
+- Maven downloads dependencies during Docker build
+- Build process is slow
+
+Build Time:
+68 seconds
+
+Status:
+Needs Optimization
