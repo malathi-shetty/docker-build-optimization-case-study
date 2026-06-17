@@ -1,3 +1,59 @@
+# Maven
 target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+
+# Java
 *.class
 *.jar
+*.war
+*.ear
+
+# Logs
+*.log
+
+# IDE - VS Code
+.vscode/
+
+# IDE - IntelliJ
+.idea/
+*.iml
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+
+# Docker
+docker-compose.override.yml
+
+# Test reports
+surefire-reports/
+failsafe-reports/
+
+# Coverage reports
+coverage/
+jacoco.exec
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Generated archives
+*.zip
+*.tar
+*.gz
+
+# Build caches
+.mvn/wrapper/maven-wrapper.jar
