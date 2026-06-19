@@ -1,31 +1,37 @@
 stages:
-
-* build
-* docker
-* report
+  - build
+  - docker
+  - report
 
 variables:
-IMAGE_NAME: docker-build-optimization
-IMAGE_TAG: $CI_PIPELINE_ID
+  IMAGE_NAME: docker-build-optimization
+  IMAGE_TAG: $CI_PIPELINE_IID
 
-build:
-stage: build
+build_jar:
+  stage: build
+  image: maven:3.9-eclipse-temurin-21
+  script:
+    - cd app/build-optimization-demo
+    - mvn clean package
+  artifacts:
+    paths:
+      - app/build-optimization-demo/target/
 
-image: maven:3.9.9-eclipse-temurin-21
+build_docker:
+  stage: docker
+  image: docker:24
+  services:
+    - docker:dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker build -f Dockerfile.multistage -t $IMAGE_NAME:$IMAGE_TAG .
 
-script:
-- cd app/build-optimization-demo
-- mvn clean package
-
-docker-build:
-stage: docker
-
-script:
-- docker build -f Dockerfile.multistage -t $IMAGE_NAME:$IMAGE_TAG .
-
-report:
-stage: report
-
-script:
-- chmod +x reports/image-size-dynamic-report.sh
-- ./reports/image-size-dynamic-report.sh
+generate_report:
+  stage: report
+  image: alpine:latest
+  script:
+    - chmod +x reports/image-size-dynamic-report.sh
+    - ./reports/image-size-dynamic-report.sh
+  dependencies:
+    - build_docker
