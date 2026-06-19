@@ -1,0 +1,31 @@
+stages:
+
+* build
+* docker
+* report
+
+variables:
+IMAGE_NAME: docker-build-optimization
+IMAGE_TAG: $CI_PIPELINE_ID
+
+build:
+stage: build
+
+image: maven:3.9.9-eclipse-temurin-21
+
+script:
+- cd app/build-optimization-demo
+- mvn clean package
+
+docker-build:
+stage: docker
+
+script:
+- docker build -f Dockerfile.multistage -t $IMAGE_NAME:$IMAGE_TAG .
+
+report:
+stage: report
+
+script:
+- chmod +x reports/image-size-dynamic-report.sh
+- ./reports/image-size-dynamic-report.sh

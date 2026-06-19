@@ -1,0 +1,46 @@
+pipeline {
+
+```
+agent any
+
+environment {
+    IMAGE_NAME = "docker-build-optimization"
+    IMAGE_TAG = "${BUILD_NUMBER}"
+}
+
+stages {
+
+    stage('Checkout') {
+        steps {
+            checkout scm
+        }
+    }
+
+    stage('Build Jar') {
+        steps {
+            sh '''
+            cd app/build-optimization-demo
+            mvn clean package
+            '''
+        }
+    }
+
+    stage('Build Docker Image') {
+        steps {
+            sh '''
+            docker build \
+            -f Dockerfile.multistage \
+            -t ${IMAGE_NAME}:${IMAGE_TAG} .
+            '''
+        }
+    }
+
+    stage('Generate Report') {
+        steps {
+            sh './reports/image-size-dynamic-report.sh'
+        }
+    }
+}
+```
+
+}
