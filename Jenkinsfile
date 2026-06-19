@@ -2,6 +2,10 @@ pipeline {
 
     agent any
 
+    tools {
+        maven 'Maven-3.9'
+    }
+
     environment {
         IMAGE_NAME = "docker-build-optimization"
         IMAGE_TAG = "${BUILD_NUMBER}"
