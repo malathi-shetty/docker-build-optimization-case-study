@@ -5,4 +5,7 @@ USER root
 RUN apt-get update && \
     apt-get install -y maven docker.io
 
+RUN groupadd -g 989 docker || true
+RUN usermod -aG docker jenkins
+
 USER jenkins
