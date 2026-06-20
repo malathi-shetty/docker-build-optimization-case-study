@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "docker-build-optimization"
+        IMAGE_NAME = "docker-build-jenkins"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
@@ -61,7 +61,7 @@ pipeline {
             steps {
                 sh '''
                 mkdir -p reports
-                
+
                 echo "Build Number: ${BUILD_NUMBER}" > reports/jenkins-report.txt
                 echo "Job Name: ${JOB_NAME}" >> reports/jenkins-report.txt
                 echo "Build Date: $(date)" >> reports/jenkins-report.txt

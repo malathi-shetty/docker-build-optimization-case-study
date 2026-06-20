@@ -5,7 +5,7 @@ stages:
   - report
 
 variables:
-  IMAGE_NAME: "docker-build-optimization"
+  IMAGE_NAME: "docker-build-gitlab"
   IMAGE_TAG: "$CI_PIPELINE_IID"
 
 build_jar:
