@@ -9,9 +9,13 @@ pipeline {
 
     stages {
 
-        stage('Debug') {
+        stage('Debug Jenkinsfile') {
             steps {
                 sh 'cat Jenkinsfile'
+                sh '''
+                echo "===== CURRENT JENKINSFILE ====="
+                grep -n "trivy-report" Jenkinsfile || true
+                '''
             }
     }
 
