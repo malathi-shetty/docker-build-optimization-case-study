@@ -178,3 +178,11 @@ By implementing Docker optimization techniques, the solution reduced build times
 and improved deployment efficiency.
 The framework can be reused across multiple projects, enabling standardized and scalable containerization practices.
 ```
+## Latest Docker Image Report
+
+| Image | Size |
+|--------|--------|
+| demo:v1 | 835MB |
+| demo:v2 | 454MB |
+| demo:v3 | 454MB |
+
