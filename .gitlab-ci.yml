@@ -20,6 +20,17 @@ build_docker:
     - docker:dind
   variables:
     DOCKER_TLS_CERTDIR: ""
+
   script:
     - docker build -f Dockerfile.multistage -t $IMAGE_NAME:$IMAGE_TAG .
     - docker images
+
+    - echo "Docker Image Report" > image-report.txt
+    - echo "===================" >> image-report.txt
+    - docker images $IMAGE_NAME:$IMAGE_TAG >> image-report.txt
+
+    - cat image-report.txt
+
+  artifacts:
+    paths:
+      - image-report.txt
