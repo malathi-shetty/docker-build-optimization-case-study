@@ -36,21 +36,16 @@ jobs:
           -t $IMAGE_NAME:$IMAGE_TAG .
 
 
-      - name: Install Trivy
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y wget
-          wget https://github.com/aquasecurity/trivy/releases/download/v0.52.2/trivy_0.52.2_Linux-64bit.deb
-          sudo dpkg -i trivy_0.52.2_Linux-64bit.deb
-
-
       - name: Trivy Scan
         run: |
           mkdir -p reports
 
-          trivy image \
+          docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v ${{ github.workspace }}/reports:/reports \
+          aquasec/trivy:latest image \
           --format table \
-          -o reports/trivy-report.txt \
+          -o /reports/trivy-report.txt \
           $IMAGE_NAME:$IMAGE_TAG
 
           cat reports/trivy-report.txt
