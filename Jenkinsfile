@@ -43,6 +43,8 @@ pipeline {
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v $(pwd)/reports:/reports \
                 aquasec/trivy:latest image \
+                --timeout 15m \
+                --scanners vuln \
                 --format table \
                 -o /reports/trivy-report.txt \
                 ${IMAGE_NAME}:${IMAGE_TAG}
