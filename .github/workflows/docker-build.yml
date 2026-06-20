@@ -5,19 +5,24 @@ on:
     branches:
       - main
 
-jobs:
+env:
+  IMAGE_NAME: docker-build-optimization
+  IMAGE_TAG: ${{ github.run_number }}
 
+jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
 
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: '21'
 
       - name: Build Jar
         run: |
@@ -28,9 +33,16 @@ jobs:
         run: |
           docker build \
           -f Dockerfile.multistage \
-          -t docker-build-optimization:${{ github.run_number }} .
+          -t $IMAGE_NAME:$IMAGE_TAG .
 
-      - name: Generate GitHub Report
+      - name: Run Trivy Scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: '${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}'
+          format: 'table'
+          output: 'reports/trivy-report.txt'
+
+      - name: Generate Report
         run: |
           mkdir -p reports
 
@@ -38,13 +50,6 @@ jobs:
           echo "Workflow: $GITHUB_WORKFLOW" >> reports/github-report.txt
           echo "Run Number: $GITHUB_RUN_NUMBER" >> reports/github-report.txt
 
-          cat reports/github-report.txt
-
-      - name: Upload Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: github-report
-          path: reports/
       - name: Upload Reports
         uses: actions/upload-artifact@v4
         with:

@@ -34,16 +34,27 @@ pipeline {
             }
         }
 
-        stage('Generate Report') {
+        stage('Trivy Scan') {
             steps {
                 sh '''
                 mkdir -p reports
 
+                trivy image \
+                --format table \
+                -o reports/trivy-report.txt \
+                ${IMAGE_NAME}:${IMAGE_TAG}
+
+                cat reports/trivy-report.txt
+                '''
+            }
+        }
+
+        stage('Generate Report') {
+            steps {
+                sh '''
                 echo "Build Number: ${BUILD_NUMBER}" > reports/jenkins-report.txt
                 echo "Job Name: ${JOB_NAME}" >> reports/jenkins-report.txt
                 echo "Build Date: $(date)" >> reports/jenkins-report.txt
-
-                cat reports/jenkins-report.txt
                 '''
             }
         }
