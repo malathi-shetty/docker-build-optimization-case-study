@@ -7,10 +7,11 @@ on:
 
 jobs:
 
-  build-jar:
+  build:
     runs-on: ubuntu-latest
 
     steps:
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-java@v4
@@ -23,27 +24,24 @@ jobs:
           cd app/build-optimization-demo
           mvn clean package
 
-  build-docker:
-    needs: build-jar
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
       - name: Build Docker Image
         run: |
           docker build \
-            -f Dockerfile.multistage \
-            -t docker-build-optimization:${{ github.run_number }} .
+          -f Dockerfile.multistage \
+          -t docker-build-optimization:${{ github.run_number }} .
 
-  generate-report:
-    needs: build-docker
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Generate Report
+      - name: Generate GitHub Report
         run: |
-          chmod +x reports/image-size-dynamic-report.sh
-          ./reports/image-size-dynamic-report.sh
+          mkdir -p reports
+
+          echo "Repository: $GITHUB_REPOSITORY" > reports/github-report.txt
+          echo "Workflow: $GITHUB_WORKFLOW" >> reports/github-report.txt
+          echo "Run Number: $GITHUB_RUN_NUMBER" >> reports/github-report.txt
+
+          cat reports/github-report.txt
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-report
+          path: reports/
