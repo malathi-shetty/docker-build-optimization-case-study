@@ -35,12 +35,25 @@ jobs:
           -f Dockerfile.multistage \
           -t $IMAGE_NAME:$IMAGE_TAG .
 
-      - name: Run Trivy Scan
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          image-ref: '${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}'
-          format: 'table'
-          output: 'reports/trivy-report.txt'
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.52.2/trivy_0.52.2_Linux-64bit.deb
+          sudo dpkg -i trivy_0.52.2_Linux-64bit.deb
+
+
+      - name: Trivy Scan
+        run: |
+          mkdir -p reports
+
+          trivy image \
+          --format table \
+          -o reports/trivy-report.txt \
+          $IMAGE_NAME:$IMAGE_TAG
+
+          cat reports/trivy-report.txt
 
       - name: Generate Report
         run: |
