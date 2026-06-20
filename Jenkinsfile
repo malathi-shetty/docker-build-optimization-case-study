@@ -61,9 +61,12 @@ pipeline {
             steps {
                 sh '''
                 mkdir -p reports
+                
                 echo "Build Number: ${BUILD_NUMBER}" > reports/jenkins-report.txt
                 echo "Job Name: ${JOB_NAME}" >> reports/jenkins-report.txt
                 echo "Build Date: $(date)" >> reports/jenkins-report.txt
+
+                cat reports/jenkins-report.txt
                 '''
             }
         }
