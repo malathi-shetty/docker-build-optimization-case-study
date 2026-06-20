@@ -37,8 +37,6 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 sh '''
-                mkdir -p reports
-
                 docker run --rm \
                 -v /var/run/docker.sock:/var/run/docker.sock \
                 -v $(pwd)/reports:/reports \
@@ -48,8 +46,6 @@ pipeline {
                 --format table \
                 -o /reports/trivy-report.txt \
                 ${IMAGE_NAME}:${IMAGE_TAG}
-
-                cat reports/trivy-report.txt
                 '''
             }
         }
