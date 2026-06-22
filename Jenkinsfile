@@ -57,6 +57,16 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+               dir('app/build-optimization-demo') {
+                  withSonarQubeEnv('SonarQube') {
+                      sh 'mvn clean verify sonar:sonar'
+            }
+        }
+    }
+}
+
         stage('Generate Report') {
             steps {
                 sh '''
