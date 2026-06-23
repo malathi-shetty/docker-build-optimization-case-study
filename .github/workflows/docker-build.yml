@@ -51,8 +51,16 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN
 
+      - name: Debug Sonar Files
+        run: |
+          find . -name "report-task.txt"
+          find . -type d | grep sonar
+
+
       - name: SonarCloud Quality Gate
         uses: SonarSource/sonarqube-quality-gate-action@master
+        with:
+          scanMetadataReportFile: app/build-optimization-demo/target/sonar/report-task.txt
         timeout-minutes: 5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
