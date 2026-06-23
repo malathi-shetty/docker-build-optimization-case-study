@@ -11,36 +11,37 @@ import java.util.logging.Logger;
 
 public class App {
 
-    private static final Logger LOGGER =
-            Logger.getLogger(App.class.getName());
+private static final Logger LOGGER =
+        Logger.getLogger(App.class.getName());
 
-    public static void main(String[] args) throws Exception {
+private static final int SERVER_PORT = 8080;
 
-        HttpServer server =
-                HttpServer.create(new InetSocketAddress(8080), 0);
+public static void main(String[] args) throws Exception {
 
-        server.createContext("/", App::homeHandler);
+    HttpServer server =
+            HttpServer.create(
+                    new InetSocketAddress(SERVER_PORT),
+                    0
+            );
 
-        server.setExecutor(null);
+    server.createContext("/", App::homeHandler);
 
-        server.start();
+    server.setExecutor(null);
 
-        LOGGER.info("Application Started");
-        LOGGER.info("Server running on port 8080");
-    }
+    server.start();
 
-    public static int getServerPort() {
-    return 8080;
-    }
+    LOGGER.info("Application Started");
+    LOGGER.info("Server running on port " + SERVER_PORT);
+}
 
 static void homeHandler(HttpExchange exchange) {
 
     try {
 
-        String response = buildHtmlResponse();
-
         byte[] responseBytes =
-                response.getBytes(StandardCharsets.UTF_8);
+                AppService.HTML_RESPONSE.getBytes(
+                        StandardCharsets.UTF_8
+                );
 
         exchange.sendResponseHeaders(
                 200,
@@ -61,27 +62,6 @@ static void homeHandler(HttpExchange exchange) {
                 e
         );
     }
-}
-
-public static String getApplicationMessage() {
-
-    return "Docker Build Optimization Project";
-}
-
-public static String buildHtmlResponse() {
-
-    return """
-            <html>
-            <head>
-                <title>Docker Build Optimization Demo</title>
-            </head>
-            <body>
-                <h1>Docker Build Optimization Project</h1>
-                <p>Application Started Successfully</p>
-                <p>Backend Response Received</p>
-            </body>
-            </html>
-            """;
 }
 
 }
