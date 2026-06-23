@@ -7,43 +7,33 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AppServiceTest {
 
-@Test
-void shouldContainProjectName() {
+    @Test
+    void shouldReturnProjectName() {
 
-    assertEquals(
-            "Docker Build Optimization Project",
-            AppService.PROJECT_NAME
-    );
-}
+        assertEquals(
+                "Docker Build Optimization Project",
+                AppService.getProjectName()
+        );
+    }
 
-@Test
-void shouldContainHtmlResponse() {
+    @Test
+    void shouldReturnHtmlResponse() {
 
-    assertTrue(
-            AppService.HTML_RESPONSE.contains("<html>")
-    );
+        String html = AppService.getHtmlResponse();
 
-    assertTrue(
-            AppService.HTML_RESPONSE.contains("</html>")
-    );
+        assertTrue(html.contains("<html>"));
+        assertTrue(html.contains("</html>"));
 
-    assertTrue(
-            AppService.HTML_RESPONSE.contains(
-                    "Docker Build Optimization Project"
-            )
-    );
+        assertTrue(
+                html.contains("Docker Build Optimization Project")
+        );
 
-    assertTrue(
-            AppService.HTML_RESPONSE.contains(
-                    "Application Started Successfully"
-            )
-    );
+        assertTrue(
+                html.contains("Application Started Successfully")
+        );
 
-    assertTrue(
-            AppService.HTML_RESPONSE.contains(
-                    "Backend Response Received"
-            )
-    );
-}
-
+        assertTrue(
+                html.contains("Backend Response Received")
+        );
+    }
 }

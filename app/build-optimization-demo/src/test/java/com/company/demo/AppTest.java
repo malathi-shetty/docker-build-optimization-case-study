@@ -6,12 +6,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AppTest {
 
-@Test
-void appClassShouldExist() {
+    @Test
+    void shouldContainHtmlResponse() {
 
-    assertTrue(
-            App.class.getName().contains("App")
-    );
-}
+        String html = AppService.getHtmlResponse();
 
+        assertTrue(
+                html.contains(
+                        "Docker Build Optimization Project"
+                )
+        );
+
+        assertTrue(
+                html.contains(
+                        "Application Started Successfully"
+                )
+        );
+
+        assertTrue(
+                html.contains(
+                        "Backend Response Received"
+                )
+        );
+    }
 }
