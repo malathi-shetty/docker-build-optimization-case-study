@@ -58,6 +58,8 @@ stages {
     stage('Build Docker Image') {
         steps {
             sh '''
+            cd app/build-optimization-demo
+
             docker build \
             -f Dockerfile.multistage \
             -t ${IMAGE_NAME}:${IMAGE_TAG} .
@@ -74,6 +76,15 @@ stages {
             --timeout 15m \
             --scanners vuln \
             ${IMAGE_NAME}:${IMAGE_TAG}
+            '''
+        }
+    }
+
+    stage('Deploy To Nexus') {
+        steps {
+            sh '''
+            cd app/build-optimization-demo
+            mvn deploy
             '''
         }
     }

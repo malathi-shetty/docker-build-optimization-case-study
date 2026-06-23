@@ -8,6 +8,13 @@
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
 
+  <distributionManagement>
+    <snapshotRepository>
+        <id>nexus-snapshots</id>
+        <url>http://172.17.0.3:8081/repository/maven-snapshots/</url>
+    </snapshotRepository>
+</distributionManagement>
+
   <name>build-optimization-demo</name>
 
   <url>http://maven.apache.org</url>
@@ -83,4 +90,5 @@
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
 </properties>
+
 </project>
