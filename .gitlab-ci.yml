@@ -5,6 +5,15 @@ stages:
   - security
   - report
 
+debug:
+  stage: build
+  image: alpine
+
+  script:
+    - pwd
+    - ls -la
+    - find . -name pom.xml
+
 variables:
   IMAGE_NAME: "docker-build-gitlab"
   IMAGE_TAG: "$CI_PIPELINE_IID"
@@ -31,7 +40,11 @@ sonarqube_scan:
     - build_jar
 
   script:
-    - mvn sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.token=$SONAR_TOKEN
+    - mvn -f app/build-optimization-demo/pom.xml sonar:sonar \
+        -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study \
+        -Dsonar.organization=malathi-shetty \
+        -Dsonar.host.url=https://sonarcloud.io \
+        -Dsonar.token=$SONAR_TOKEN
 
 build_docker:
   stage: docker
