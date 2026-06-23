@@ -1,29 +1,38 @@
 package com.company.demo;
 
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class App {
 
+    private static final Logger LOGGER =
+            Logger.getLogger(App.class.getName());
+
     public static void main(String[] args) throws Exception {
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        HttpServer server =
+                HttpServer.create(new InetSocketAddress(8080), 0);
 
         server.createContext("/", App::homeHandler);
 
         server.setExecutor(null);
+
         server.start();
 
-        System.out.println("Application Started");
-        System.out.println("Server running on port 8080");
+        LOGGER.info("Application Started");
+        LOGGER.info("Server running on port 8080");
     }
 
     private static void homeHandler(HttpExchange exchange) {
 
         try {
+
             String response = """
                     <html>
                     <head>
@@ -37,14 +46,22 @@ public class App {
                     </html>
                     """;
 
-            exchange.sendResponseHeaders(200, response.getBytes().length);
+            byte[] responseBytes =
+                    response.getBytes(StandardCharsets.UTF_8);
 
-            OutputStream os = exchange.getResponseBody();
-            os.write(response.getBytes());
-            os.close();
+            exchange.sendResponseHeaders(200, responseBytes.length);
+
+            try (OutputStream os = exchange.getResponseBody()) {
+                os.write(responseBytes);
+            }
 
         } catch (Exception e) {
-            e.printStackTrace();
+
+            LOGGER.log(
+                    Level.SEVERE,
+                    "Error processing HTTP request",
+                    e
+            );
         }
     }
 }
