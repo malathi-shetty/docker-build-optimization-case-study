@@ -80,6 +80,12 @@ stages {
         }
     }
 
+    stage('Start Nexus And Continue') {
+        steps {
+            input message: 'Start Nexus now and click Proceed'
+        }
+    }
+
     stage('Deploy To Nexus') {
         steps {
             sh '''
