@@ -39,7 +39,7 @@ static void homeHandler(HttpExchange exchange) {
     try {
 
         byte[] responseBytes =
-                AppService.getHtmlResponse().getBytes(
+                AppService.HTML_RESPONSE.getBytes(
                         StandardCharsets.UTF_8
                 );
 

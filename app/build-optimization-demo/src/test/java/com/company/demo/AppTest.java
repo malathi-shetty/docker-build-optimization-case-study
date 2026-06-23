@@ -9,7 +9,7 @@ class AppTest {
     @Test
     void shouldContainHtmlResponse() {
 
-        String html = AppService.getHtmlResponse();
+        String html = AppService.HTML_RESPONSE;
 
         assertTrue(
                 html.contains(

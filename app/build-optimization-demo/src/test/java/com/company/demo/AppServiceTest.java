@@ -19,7 +19,7 @@ class AppServiceTest {
     @Test
     void shouldReturnHtmlResponse() {
 
-        String html = AppService.getHtmlResponse();
+        String html = AppService.HTML_RESPONSE;
 
         assertTrue(html.contains("<html>"));
         assertTrue(html.contains("</html>"));
