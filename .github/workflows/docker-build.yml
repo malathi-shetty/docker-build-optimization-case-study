@@ -1,13 +1,20 @@
-name: Docker Build Optimization
+name: Docker Build Optimization CI Pipeline
 
 on:
   push:
     branches:
       - main
 
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
 env:
   IMAGE_NAME: docker-build-github
-  IMAGE_TAG: ${{ github.run_number }}
+  IMAGE_TAG: ${{ github.run_number }}-${{ github.sha }}
 
 jobs:
   build:
@@ -23,11 +30,32 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+          cache: maven
 
-      - name: Build Jar
+      - name: Build and Verify
         run: |
           cd app/build-optimization-demo
-          mvn clean package
+          mvn clean verify
+
+      #  after SonarQube/SonarCloud setup
+
+      - name: SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          cd app/build-optimization-demo
+
+          mvn sonar:sonar \
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=$SONAR_TOKEN
+
+      - name: SonarCloud Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@master
+        timeout-minutes: 5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build Docker Image
         run: |
@@ -35,8 +63,7 @@ jobs:
           -f Dockerfile.multistage \
           -t $IMAGE_NAME:$IMAGE_TAG .
 
-
-      - name: Trivy Scan
+      - name: Trivy Security Scan
         run: |
           mkdir -p reports
 
@@ -44,11 +71,23 @@ jobs:
           -v /var/run/docker.sock:/var/run/docker.sock \
           -v ${{ github.workspace }}/reports:/reports \
           aquasec/trivy:latest image \
+          --severity HIGH,CRITICAL \
           --format table \
           -o /reports/trivy-report.txt \
           $IMAGE_NAME:$IMAGE_TAG
 
           cat reports/trivy-report.txt
+
+      # comment if you want pipeline to pass on CRITICAL vulnerabilities
+
+      - name: Trivy Fail On Critical
+        run: |
+          docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy:latest image \
+          --severity CRITICAL \
+          --exit-code 1 \
+          $IMAGE_NAME:$IMAGE_TAG
 
       - name: Generate Report
         run: |
@@ -57,9 +96,15 @@ jobs:
           echo "Repository: $GITHUB_REPOSITORY" > reports/github-report.txt
           echo "Workflow: $GITHUB_WORKFLOW" >> reports/github-report.txt
           echo "Run Number: $GITHUB_RUN_NUMBER" >> reports/github-report.txt
+          echo "Commit SHA: $GITHUB_SHA" >> reports/github-report.txt
+          echo "Branch: $GITHUB_REF_NAME" >> reports/github-report.txt
+          echo "Date: $(date)" >> reports/github-report.txt
+
+          cat reports/github-report.txt
 
       - name: Upload Reports
         uses: actions/upload-artifact@v4
         with:
           name: reports
           path: reports/
+          retention-days: 30
