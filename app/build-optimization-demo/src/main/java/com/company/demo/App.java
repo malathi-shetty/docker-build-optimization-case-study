@@ -29,6 +29,10 @@ public class App {
         LOGGER.info("Server running on port 8080");
     }
 
+    public static int getServerPort() {
+    return 8080;
+    }
+
 static void homeHandler(HttpExchange exchange) {
 
     try {
