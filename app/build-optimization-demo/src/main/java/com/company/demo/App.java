@@ -29,39 +29,55 @@ public class App {
         LOGGER.info("Server running on port 8080");
     }
 
-    private static void homeHandler(HttpExchange exchange) {
+static void homeHandler(HttpExchange exchange) {
 
-        try {
+    try {
 
-            String response = """
-                    <html>
-                    <head>
-                        <title>Docker Build Optimization Demo</title>
-                    </head>
-                    <body>
-                        <h1>Docker Build Optimization Project</h1>
-                        <p>Application Started Successfully</p>
-                        <p>Backend Response Received</p>
-                    </body>
-                    </html>
-                    """;
+        String response = buildHtmlResponse();
 
-            byte[] responseBytes =
-                    response.getBytes(StandardCharsets.UTF_8);
+        byte[] responseBytes =
+                response.getBytes(StandardCharsets.UTF_8);
 
-            exchange.sendResponseHeaders(200, responseBytes.length);
+        exchange.sendResponseHeaders(
+                200,
+                responseBytes.length
+        );
 
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(responseBytes);
-            }
+        try (OutputStream os =
+                     exchange.getResponseBody()) {
 
-        } catch (Exception e) {
-
-            LOGGER.log(
-                    Level.SEVERE,
-                    "Error processing HTTP request",
-                    e
-            );
+            os.write(responseBytes);
         }
+
+    } catch (Exception e) {
+
+        LOGGER.log(
+                Level.SEVERE,
+                "Error processing HTTP request",
+                e
+        );
     }
+}
+
+public static String getApplicationMessage() {
+
+    return "Docker Build Optimization Project";
+}
+
+public static String buildHtmlResponse() {
+
+    return """
+            <html>
+            <head>
+                <title>Docker Build Optimization Demo</title>
+            </head>
+            <body>
+                <h1>Docker Build Optimization Project</h1>
+                <p>Application Started Successfully</p>
+                <p>Backend Response Received</p>
+            </body>
+            </html>
+            """;
+}
+
 }
