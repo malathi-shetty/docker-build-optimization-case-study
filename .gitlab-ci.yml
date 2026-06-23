@@ -15,6 +15,7 @@ build_jar:
   image: maven:3.9-eclipse-temurin-21
 
   script:
+    - cd app/build-optimization-demo
     - mvn clean verify
 
   artifacts:
