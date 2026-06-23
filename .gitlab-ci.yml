@@ -1,91 +1,86 @@
 stages:
-
-* build
-* sonar
-* docker
-* security
-* report
+  - build
+  - sonar
+  - docker
+  - security
+  - report
 
 variables:
-IMAGE_NAME: "docker-build-gitlab"
-IMAGE_TAG: "$CI_PIPELINE_IID"
+  IMAGE_NAME: "docker-build-gitlab"
+  IMAGE_TAG: "$CI_PIPELINE_IID"
+  DOCKER_TLS_CERTDIR: ""
 
 build_jar:
-stage: build
-image: maven:3.9-eclipse-temurin-21
+  stage: build
+  image: maven:3.9-eclipse-temurin-21
 
-script:
-- mvn clean verify
+  script:
+    - mvn clean verify
 
-artifacts:
-paths:
-- target/
-expire_in: 1 day
+  artifacts:
+    paths:
+      - target/
+    expire_in: 1 day
 
 sonarqube_scan:
-stage: sonar
-image: maven:3.9-eclipse-temurin-21
+  stage: sonar
+  image: maven:3.9-eclipse-temurin-21
 
-dependencies:
-- build_jar
+  dependencies:
+    - build_jar
 
-script:
-- mvn sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.token=$SONAR_TOKEN
+  script:
+    - mvn sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.token=$SONAR_TOKEN
 
 build_docker:
-stage: docker
-image: docker:24
+  stage: docker
+  image: docker:24
 
-services:
-- docker:dind
+  services:
+    - docker:dind
 
-variables:
-DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker build -f Dockerfile.multistage -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker save $IMAGE_NAME:$IMAGE_TAG -o image.tar
 
-script:
-- docker build -f Dockerfile.multistage -t $IMAGE_NAME:$IMAGE_TAG .
-- docker save $IMAGE_NAME:$IMAGE_TAG -o image.tar
-
-artifacts:
-paths:
-- image.tar
+  artifacts:
+    paths:
+      - image.tar
 
 trivy_scan:
-stage: security
-image: docker:24
+  stage: security
+  image: docker:24
 
-services:
-- docker:dind
+  services:
+    - docker:dind
 
-variables:
-DOCKER_TLS_CERTDIR: ""
+  dependencies:
+    - build_docker
 
-dependencies:
-- build_docker
+  script:
+    - mkdir -p reports
+    - docker load -i image.tar
+    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/reports:/reports aquasec/trivy:latest image --timeout 15m --scanners vuln --format table -o /reports/trivy-report.txt $IMAGE_NAME:$IMAGE_TAG
+    - cat reports/trivy-report.txt
 
-script:
-- mkdir -p reports
-- docker load -i image.tar
-- docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/reports:/reports aquasec/trivy:latest image --timeout 15m --scanners vuln --format table -o /reports/trivy-report.txt $IMAGE_NAME:$IMAGE_TAG
-
-artifacts:
-paths:
-- reports/
+  artifacts:
+    paths:
+      - reports/
 
 generate_report:
-stage: report
-image: alpine:latest
+  stage: report
+  image: alpine:latest
 
-dependencies:
-- trivy_scan
+  dependencies:
+    - trivy_scan
 
-script:
-- mkdir -p reports
-- echo "Pipeline ID = $CI_PIPELINE_ID" > reports/gitlab-report.txt
-- echo "Project Name = $CI_PROJECT_NAME" >> reports/gitlab-report.txt
-- echo "Commit SHA = $CI_COMMIT_SHA" >> reports/gitlab-report.txt
-- cat reports/gitlab-report.txt
+  script:
+    - mkdir -p reports
+    - echo "Pipeline ID = $CI_PIPELINE_ID" > reports/gitlab-report.txt
+    - echo "Project Name = $CI_PROJECT_NAME" >> reports/gitlab-report.txt
+    - echo "Commit SHA = $CI_COMMIT_SHA" >> reports/gitlab-report.txt
+    - cat reports/gitlab-report.txt
 
-artifacts:
-paths:
-- reports/
+  artifacts:
+    paths:
+      - reports/
