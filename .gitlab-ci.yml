@@ -40,11 +40,8 @@ sonarqube_scan:
     - build_jar
 
   script:
-    - mvn -f app/build-optimization-demo/pom.xml sonar:sonar \
-        -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study \
-        -Dsonar.organization=malathi-shetty \
-        -Dsonar.host.url=https://sonarcloud.io \
-        -Dsonar.token=$SONAR_TOKEN
+    - cd app/build-optimization-demo
+    - mvn sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=$SONAR_TOKEN
 
 build_docker:
   stage: docker
