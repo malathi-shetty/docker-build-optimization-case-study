@@ -29,8 +29,8 @@ build_jar:
 
   artifacts:
     paths:
-      - target/
-    expire_in: 1 day
+      - app/build-optimization-demo/target
+    expire_in: 90 days
 
 sonarqube_scan:
   stage: sonar
@@ -41,7 +41,7 @@ sonarqube_scan:
 
   script:
     - cd app/build-optimization-demo
-    - mvn sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=$SONAR_TOKEN
+    - mvn clean verify sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=$SONAR_TOKEN -Dsonar.java.binaries=target/classes
 
 build_docker:
   stage: docker
