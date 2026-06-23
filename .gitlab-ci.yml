@@ -30,10 +30,7 @@ dependencies:
 - build_jar
 
 script:
-- mvn sonar:sonar
--Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study
--Dsonar.organization=malathi-shetty
--Dsonar.token=$SONAR_TOKEN
+- mvn sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.token=$SONAR_TOKEN
 
 build_docker:
 stage: docker
@@ -69,16 +66,7 @@ dependencies:
 script:
 - mkdir -p reports
 - docker load -i image.tar
-- docker run --rm
--v /var/run/docker.sock:/var/run/docker.sock
--v $(pwd)/reports:/reports
-aquasec/trivy:latest
-image
---timeout 15m
---scanners vuln
---format table
--o /reports/trivy-report.txt
-$IMAGE_NAME:$IMAGE_TAG
+- docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/reports:/reports aquasec/trivy:latest image --timeout 15m --scanners vuln --format table -o /reports/trivy-report.txt $IMAGE_NAME:$IMAGE_TAG
 
 artifacts:
 paths:
