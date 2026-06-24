@@ -58,8 +58,6 @@ stages {
     stage('Build Docker Image') {
         steps {
             sh '''
-            cd app/build-optimization-demo
-
             docker build \
             -f Dockerfile.multistage \
             -t ${IMAGE_NAME}:${IMAGE_TAG} .
