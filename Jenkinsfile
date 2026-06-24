@@ -40,7 +40,7 @@ stages {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
                     mvn clean verify sonar:sonar \
-                    -Dsonar.projectKey=docker-build-optimization
+                    -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study
                     '''
                 }
             }
