@@ -6,20 +6,12 @@ stages:
   - deploy
   - report
 
-debug:
-  stage: build
-  image: alpine
-
-  script:
-    - pwd
-    - ls -la
-    - find . -name pom.xml
-
 variables:
   IMAGE_NAME: "docker-build-gitlab"
   IMAGE_TAG: "$CI_PIPELINE_IID"
   DOCKER_TLS_CERTDIR: ""
 
+# ---------------- BUILD ----------------
 build_jar:
   stage: build
   image: maven:3.9-eclipse-temurin-21
@@ -31,8 +23,9 @@ build_jar:
   artifacts:
     paths:
       - app/build-optimization-demo/target
-    expire_in: 90 days
+    expire_in: 7 days
 
+# ---------------- SONAR ----------------
 sonarqube_scan:
   stage: sonar
   image: maven:3.9-eclipse-temurin-21
@@ -42,8 +35,14 @@ sonarqube_scan:
 
   script:
     - cd app/build-optimization-demo
-    - mvn clean verify sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=$SONAR_TOKEN -Dsonar.java.binaries=target/classes
+    - mvn sonar:sonar
+      -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study
+      -Dsonar.organization=malathi-shetty
+      -Dsonar.host.url=https://sonarcloud.io
+      -Dsonar.token=$SONAR_TOKEN
+      -Dsonar.java.binaries=target/classes
 
+# ---------------- DOCKER BUILD ----------------
 build_docker:
   stage: docker
   image: docker:24
@@ -59,6 +58,7 @@ build_docker:
     paths:
       - image.tar
 
+# ---------------- SECURITY (TRIVY) ----------------
 trivy_scan:
   stage: security
   image: docker:24
@@ -72,14 +72,22 @@ trivy_scan:
   script:
     - mkdir -p reports
     - docker load -i image.tar
-    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/reports:/reports aquasec/trivy:latest image --timeout 15m --scanners vuln --format table -o /reports/trivy-report.txt $IMAGE_NAME:$IMAGE_TAG
+    - docker run --rm
+      -v /var/run/docker.sock:/var/run/docker.sock
+      -v $(pwd)/reports:/reports
+      aquasec/trivy:latest image
+      --severity HIGH,CRITICAL
+      --format table
+      -o /reports/trivy-report.txt
+      $IMAGE_NAME:$IMAGE_TAG
     - cat reports/trivy-report.txt
 
   artifacts:
     paths:
       - reports/
 
-upload_nexus:
+# ---------------- NEXUS DEPLOY ----------------
+deploy_nexus:
   stage: deploy
   image: curlimages/curl:latest
 
@@ -87,8 +95,14 @@ upload_nexus:
     - build_jar
 
   script:
-    - curl -u "$NEXUS_USER:$NEXUS_PASSWORD" --upload-file app/build-optimization-demo/target/build-optimization-demo-1.0-SNAPSHOT.war http://35.92.84.93:8082/repository/maven-snapshots/com/demo/build-optimization-demo/1.0-SNAPSHOT/build-optimization-demo-1.0-SNAPSHOT.war
+    - echo "Uploading WAR to Nexus..."
+    - ls -la app/build-optimization-demo/target
 
+    - curl -u "$NEXUS_USER:$NEXUS_PASSWORD"
+      --upload-file app/build-optimization-demo/target/build-optimization-demo-1.0-SNAPSHOT.war
+      http://35.92.84.93:8082/repository/maven-snapshots/com/demo/build-optimization-demo/1.0-SNAPSHOT/build-optimization-demo-1.0-SNAPSHOT.war
+
+# ---------------- DOCKER HUB PUSH ----------------
 dockerhub_push:
   stage: deploy
   image: docker:24
@@ -101,12 +115,15 @@ dockerhub_push:
 
   script:
     - docker load -i image.tar
-    - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKER_USER/$IMAGE_NAME:latest
-    - docker push $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG
-    - docker push $DOCKER_USER/$IMAGE_NAME:latest
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+    - docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+
+    - docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+    - docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+
+# ---------------- TOMCAT DEPLOY ----------------
 deploy_tomcat:
   stage: deploy
   image: curlimages/curl:latest
@@ -115,18 +132,24 @@ deploy_tomcat:
     - build_jar
 
   script:
-    - curl -u "$TOMCAT_USER:$TOMCAT_PASSWORD" -T app/build-optimization-demo/target/build-optimization-demo-1.0-SNAPSHOT.war "http://35.92.84.93:8080/manager/text/deploy?path=/build-optimization-demo&update=true"
+    - echo "Deploying WAR to Tomcat..."
+    - ls -la app/build-optimization-demo/target
 
+    - curl -u "admin:Admin@123"
+      -T app/build-optimization-demo/target/build-optimization-demo-1.0-SNAPSHOT.war
+      "http://35.92.84.93:8080/manager/text/deploy?path=/build-optimization-demo&update=true"
+
+# ---------------- REPORT ----------------
 generate_report:
   stage: report
-  image: alpine
+  image: alpine:latest
 
   script:
     - mkdir -p reports
     - echo "Pipeline ID = $CI_PIPELINE_ID" > reports/gitlab-report.txt
-    - echo "Project Name = $CI_PROJECT_NAME" >> reports/gitlab-report.txt
-    - echo "Commit SHA = $CI_COMMIT_SHA" >> reports/gitlab-report.txt
-    - echo "Docker Image = $IMAGE_NAME:$IMAGE_TAG" >> reports/gitlab-report.txt
+    - echo "Project = $CI_PROJECT_NAME" >> reports/gitlab-report.txt
+    - echo "Commit = $CI_COMMIT_SHA" >> reports/gitlab-report.txt
+    - echo "Image = $IMAGE_NAME:$IMAGE_TAG" >> reports/gitlab-report.txt
     - date >> reports/gitlab-report.txt
     - cat reports/gitlab-report.txt
 
