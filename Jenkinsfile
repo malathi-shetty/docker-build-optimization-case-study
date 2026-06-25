@@ -15,7 +15,7 @@ pipeline {
         TOMCAT_SERVER = "ubuntu@172.31.44.114"
         TOMCAT_PATH = "/var/lib/tomcat10/webapps"
 
-        VERSION = "${BUILD_NUMBER}-${currentBuild.startTimeInMillis}"
+        VERSION = "${BUILD_NUMBER}-${BUILD_ID}"
     }
 
     stages {
@@ -30,8 +30,9 @@ pipeline {
             steps {
                 sh '''
                 cd app/build-optimization-demo
+
                 mvn clean package -DskipTests
-                 -Drevision=${BUILD_NUMBER}-${BUILD_ID}
+                
                 ls -lah target
                 '''
             }
@@ -42,7 +43,7 @@ pipeline {
                 sh '''
                 docker build \
                 -f Dockerfile.multistage \
-                -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                -t ${IMAGE_NAME}:${VERSION} .
                 '''
             }
         }
@@ -140,7 +141,7 @@ pipeline {
                     --settings $MAVEN_SETTINGS \
                     -DskipTests \
                     -DaltDeploymentRepository=nexus-releases::default::http://172.17.0.1:8082/repository/maven-releases/ \
-                    -Drevision=${VERSION}
+                    
                     '''
         }
     }
