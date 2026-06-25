@@ -6,12 +6,17 @@
   <groupId>com.company.demo</groupId>
   <artifactId>build-optimization-demo</artifactId>
   <packaging>war</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
 
-  <distributionManagement>
+<distributionManagement>
+    <repository>
+        <id>nexus-releases</id>
+        <url>http://172.17.0.1:8082/repository/maven-releases/</url>
+    </repository>
+
     <snapshotRepository>
         <id>nexus-snapshots</id>
-        <url>http://nexus:8081/repository/maven-snapshots/</url>
+        <url>http://172.17.0.1:8082/repository/maven-snapshots/</url>
     </snapshotRepository>
 </distributionManagement>
 

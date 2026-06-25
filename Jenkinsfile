@@ -132,7 +132,7 @@ pipeline {
                 cd app/build-optimization-demo
 
                 mvn deploy \
-                -DaltDeploymentRepository=nexus-releases::default::${NEXUS_URL}/repository/maven-releases/
+                -DaltDeploymentRepository=nexus-releases::default::http://172.17.0.1:8082/repository/maven-releases/
                 '''
             }
         }
