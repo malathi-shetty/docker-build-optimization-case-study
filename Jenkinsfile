@@ -143,13 +143,20 @@ pipeline {
         stage('Deploy To Tomcat') {
             steps {
                 sh '''
-                echo "Deploying WAR to Tomcat via SCP..."
+                echo "Setting up SSH trust..."
 
-                scp app/build-optimization-demo/target/*.war \
+                mkdir -p ~/.ssh
+
+                ssh-keyscan -H 172.31.44.114 >> ~/.ssh/known_hosts
+
+                echo "Deploying WAR..."
+
+                scp -o StrictHostKeyChecking=no \
+                app/build-optimization-demo/target/build-optimization-demo-1.0.war \
                 ubuntu@172.31.44.114:/tmp/app.war
 
-                ssh ubuntu@172.31.44.114 "
-                    sudo mv /tmp/app.war /var/lib/tomcat10/webapps/
+                ssh -o StrictHostKeyChecking=no ubuntu@172.31.44.114 "
+                    sudo mv /tmp/app.war /var/lib/tomcat10/webapps/ROOT.war
                     sudo systemctl restart tomcat10
                 "
 
