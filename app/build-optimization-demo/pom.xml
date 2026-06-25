@@ -40,11 +40,7 @@
             <artifactId>maven-jar-plugin</artifactId>
             <version>3.3.0</version>
 
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>3.4.0</version>
-        </plugin>
+
 
             <configuration>
                 <archive>
@@ -54,6 +50,12 @@
                 </archive>
             </configuration>
         </plugin>
+
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <version>3.4.0</version>
+        </plugin>        
 
         <plugin>
             <groupId>org.sonarsource.scanner.maven</groupId>
