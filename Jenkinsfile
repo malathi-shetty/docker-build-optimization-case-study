@@ -15,7 +15,7 @@ pipeline {
         TOMCAT_SERVER = "ubuntu@172.31.44.114"
         TOMCAT_PATH = "/var/lib/tomcat10/webapps"
 
-        BUILD_VERSION = "1.0-${BUILD_NUMBER}"
+        APP_VERSION = "1.0-${BUILD_NUMBER}"
     }
 
     stages {
@@ -43,7 +43,7 @@ pipeline {
                 sh '''
                 docker build \
                 -f Dockerfile.multistage \
-                -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                -t ${IMAGE_NAME}:${APP_VERSION} .
                 '''
             }
         }
@@ -75,7 +75,7 @@ pipeline {
                               aquasec/trivy:latest image \
                               --timeout 10m \
                               --scanners vuln \
-                              ${IMAGE_NAME}:${IMAGE_TAG} || true
+                              ${IMAGE_NAME}:${APP_VERSION} || true
                             '''
                         }
                     )
@@ -124,9 +124,9 @@ pipeline {
 
                     docker images | grep ${IMAGE_NAME}
 
-                    docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_REPO}:${IMAGE_TAG}
+                    docker tag ${IMAGE_NAME}:${APP_VERSION} ${DOCKERHUB_REPO}:${APP_VERSION}
 
-                    docker push ${DOCKERHUB_REPO}:${IMAGE_TAG}
+                    docker push ${DOCKERHUB_REPO}:${APP_VERSION}
                     '''
                 }
             }
@@ -141,6 +141,7 @@ pipeline {
 
                     mvn clean deploy \
                     -DskipTests \
+                    -Drevision=${APP_VERSION} \
                     --settings $MAVEN_SETTINGS
                     
                     '''
@@ -159,7 +160,7 @@ pipeline {
                 echo "Deploying WAR..."
 
                 scp -o StrictHostKeyChecking=no \
-                app/build-optimization-demo/target/build-optimization-demo-1.0.war \
+                app/build-optimization-demo/target/*.war \
                 ubuntu@172.31.44.114:/tmp/app.war
 
                 ssh -o StrictHostKeyChecking=no ubuntu@172.31.44.114 "
