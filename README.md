@@ -1,89 +1,110 @@
 
-# docker-build-optimization-case-study
-Real-world DevOps project focused on reducing Docker build time, image size, and deployment latency for organizations deploying 20–30 applications daily.
+# Docker Build Optimization & DevSecOps CI/CD Case Study
 
+![Java](https://img.shields.io/badge/Java-21-blue)
+![Maven](https://img.shields.io/badge/Maven-Build-red)
+![Docker](https://img.shields.io/badge/Docker-Containerization-blue)
+![Jenkins](https://img.shields.io/badge/Jenkins-CI%2FCD-orange)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-CI%2FCD-black)
+![GitLab CI](https://img.shields.io/badge/GitLab-CI%2FCD-orange)
+![SonarCloud](https://img.shields.io/badge/SonarCloud-Code_Quality-blue)
+![Trivy](https://img.shields.io/badge/Trivy-Security-green)
+![Nexus](https://img.shields.io/badge/Nexus-Artifacts-purple)
+![Tomcat](https://img.shields.io/badge/Tomcat-Deployment-yellow)
 
----
-
-### Title
-
-```markdown
-# Docker Build Optimization Challenge
-```
-
----
-
-### Project Overview
-
-```markdown
 ## Overview
 
-A software company builds and deploys 20–30 applications daily.
+A software company deploys 20–30 applications daily. As deployment frequency increased, Docker image build times became slower, image sizes grew significantly, and deployment latency impacted release cycles.
 
-As the number of deployments increased, Docker image build times became slower, image sizes grew significantly,
-and deployment latency increased.
+This project started as a Docker Build Optimization initiative and evolved into a complete DevSecOps CI/CD solution integrating automated builds, code quality analysis, security scanning, artifact management, container registry publishing, and deployment automation.
 
-This project demonstrates a DevOps approach to optimizing the Docker build process using:
-
-- Docker Layer Caching
-- Multi-Stage Builds
-- Docker BuildKit
-- Docker Compose
-- Reusable Dockerfile Strategies
-```
+The solution demonstrates how Docker optimization techniques and DevSecOps practices can improve build efficiency, deployment consistency, application quality, and security.
 
 ---
 
-### Business Problem
+# Business Problem
 
-```markdown
-## Business Problem
+## Challenges
 
-Current Challenges:
+* Slow Docker image builds
+* Large Docker images
+* Increased storage consumption
+* Slow image push and pull operations
+* Delayed deployments
+* Manual quality validation
+* Manual security checks
 
-- Slow Docker image builds
-- Large image sizes
-- Increased storage costs
-- Slow image push/pull operations
-- Delayed deployments
+## Goals
 
-Goal:
-
-- Reduce build time
-- Reduce image size
-- Improve deployment speed
-- Create a reusable Docker strategy
-```
+* Reduce build time
+* Optimize Docker images
+* Improve deployment speed
+* Automate CI/CD workflows
+* Introduce quality gates
+* Introduce security scanning
+* Standardize deployment processes
 
 ---
 
-### Architecture
+# Solution Architecture
 
-```markdown
-## Solution Architecture
-
-Source Code
-     ↓
+```text
+Developer
+    │
+    ▼
+GitHub / GitLab Repository
+    │
+    ▼
+CI/CD Pipeline
+(Jenkins | GitHub Actions | GitLab CI/CD)
+    │
+    ▼
+Maven Build
+    │
+    ▼
+Unit Testing
+    │
+    ▼
+SonarCloud Analysis
+(Code Quality Gate)
+    │
+    ▼
 Docker Build
-     ↓
-Optimized Dockerfile
-     ↓
-Multi-Stage Build
-     ↓
-Smaller Docker Image
-     ↓
-Faster Deployment
+    │
+    ▼
+Multi-Stage Docker Build
+    │
+    ▼
+Trivy Security Scan
+    │
+    ▼
+Artifacts Generated
+    ├── WAR File
+    └── Docker Image
+    │
+    ▼
+Nexus Repository
+(Artifact Storage)
+    │
+    ▼
+Docker Hub
+(Container Registry)
+    │
+    ▼
+Apache Tomcat
+(Application Deployment)
+    │
+    ▼
+Application Available To End Users
 ```
 
 ---
 
-### Project Structure
+# Project Structure
 
-```markdown
-## Project Structure
-
+```text
 docker-build-optimization/
-│
+
 ├── app/
 │   ├── pom.xml
 │   └── src/
@@ -92,97 +113,207 @@ docker-build-optimization/
 ├── Dockerfile.v2
 ├── Dockerfile.multistage
 │
+├── Jenkinsfile
+├── .github/workflows/
+├── .gitlab-ci.yml
+│
 ├── docker-compose.yml
 │
 ├── reports/
 │   ├── build-comparison.md
-│   └── image-size-comparison.md
+│   ├── image-size-comparison.md
+│   ├── sonar-report
+│   └── trivy-report
 │
 └── README.md
 ```
 
 ---
 
-### Optimization Phases
+# Optimization Journey
 
-```markdown
-## Optimization Phases
+## Phase 1 – Baseline Docker Build
 
-### Phase 1
-Baseline Docker Build
+### Dockerfile.v1
 
-### Phase 2
-Docker Layer Caching
+* Traditional single-stage build
+* Maven and build dependencies included in final image
+* Larger runtime footprint
+* Slower deployment process
 
-### Phase 3
-Multi-Stage Build
-
-### Phase 4
-Docker Compose Deployment
-
-### Phase 5
-Docker BuildKit Integration
-```
+**Image Size: 856 MB**
 
 ---
 
-### Results
+## Phase 2 – Docker Layer Optimization
 
+### Dockerfile.v2
 
+* Improved Docker layer ordering
+* Better cache utilization
+* Reduced rebuild time
+* Smaller runtime image
 
-
-| Metric | Before | After |
-|----------|----------|----------|
-| Build Time | 15 min | 4 min |
-| Image Size | 2 GB | 250 MB |
-| Deployment Time | 8 min | 1 min |
-
-
----
-
-### Technologies Used
-
-```markdown
-## Technologies
-
-- Docker
-- Docker Compose
-- Docker BuildKit
-- Java
-- Spring Boot
-- Maven
-```
+**Image Size: 454 MB**
 
 ---
 
-### Key Learnings
+## Phase 3 – Multi-Stage Build
 
-```markdown
-## Key Learnings
+### Dockerfile.multistage
 
-- Docker Layer Caching
-- Multi-Stage Builds
-- Image Optimization
-- Containerized Deployments
-- DevOps Best Practices
-```
+* Separate build stage and runtime stage
+* Maven used only during build
+* Build dependencies excluded from runtime image
+* Improved maintainability and security
+
+**Image Size: 612 MB**
+
+### Why did the image size increase compared to V2?
+
+The project initially used executable JAR packaging for standalone application execution.
+
+As the deployment architecture evolved, the application was migrated to WAR packaging and deployed on Apache Tomcat.
+
+The Tomcat runtime introduces additional components, increasing the final image size. However, this change aligned the project with enterprise deployment standards and enabled automated deployment through CI/CD pipelines.
+
+The increase in image size was driven by deployment architecture requirements rather than Docker optimization limitations.
 
 ---
 
+## Phase 4 – CI/CD Automation
 
+Implemented automated pipelines using:
 
-```markdown
-## Business Impact
+* Jenkins
+* GitHub Actions
+* GitLab CI/CD
 
-By implementing Docker optimization techniques, the solution reduced build times, minimized storage consumption,
-and improved deployment efficiency.
-The framework can be reused across multiple projects, enabling standardized and scalable containerization practices.
-```
-## Latest Docker Image Report
+Pipeline stages:
 
-| Image | Size |
-|--------|--------|
-| demo:v1 | 835MB |
-| demo:v2 | 454MB |
-| demo:v3 | 454MB |
+* Build
+* Test
+* Code Analysis
+* Security Scan
+* Artifact Publishing
+* Deployment
 
+---
+
+## Phase 5 – DevSecOps Integration
+
+### SonarCloud
+
+* Code Quality Analysis
+* Code Smell Detection
+* Technical Debt Monitoring
+* Quality Gate Validation
+
+### Trivy
+
+* Container Vulnerability Scanning
+* HIGH Severity Detection
+* CRITICAL Severity Detection
+
+### Nexus Repository
+
+* Artifact Storage
+* Version Management
+* Centralized Repository
+
+### Docker Hub
+
+* Image Registry
+* Versioned Image Publishing
+
+---
+
+# Results
+
+| Metric                  | Before        | After            |
+| ----------------------- | ------------- | ---------------- |
+| Build Process           | Manual        | Automated        |
+| Security Validation     | Manual        | Automated        |
+| Code Quality Validation | Not Available | SonarCloud       |
+| Artifact Management     | Manual        | Nexus Repository |
+| Deployment Process      | Manual        | CI/CD Driven     |
+
+---
+
+# Docker Image Evolution
+
+| Version | Packaging | Deployment Model         | Image Size |
+| ------- | --------- | ------------------------ | ---------- |
+| V1      | JAR       | Standalone Java Runtime  | 856 MB     |
+| V2      | JAR       | Optimized Java Runtime   | 454 MB     |
+| V3      | WAR       | Apache Tomcat Deployment | 612 MB     |
+
+---
+
+# Technologies Used
+
+## CI/CD
+
+* Jenkins
+* GitHub Actions
+* GitLab CI/CD
+
+## Build Tools
+
+* Maven
+* Java
+* Spring Boot
+
+## Containerization
+
+* Docker
+* Docker Compose
+* Docker BuildKit
+
+## Quality & Security
+
+* SonarCloud
+* Trivy
+
+## Artifact Management
+
+* Nexus Repository Manager
+
+## Deployment
+
+* Apache Tomcat
+* Docker Hub
+
+---
+
+# Key Learnings
+
+* Docker Layer Caching
+* Multi-Stage Docker Builds
+* Docker Image Optimization
+* CI/CD Pipeline Automation
+* DevSecOps Practices
+* SonarCloud Integration
+* Trivy Security Scanning
+* Nexus Artifact Management
+* Docker Hub Publishing
+* Enterprise WAR Deployment
+* Automated Application Delivery
+
+---
+
+# Business Impact
+
+The solution transformed a Docker optimization initiative into a complete DevSecOps CI/CD pipeline.
+
+Benefits achieved:
+
+* Faster and more reliable deployments
+* Automated code quality validation
+* Automated vulnerability scanning
+* Centralized artifact management
+* Standardized deployment workflows
+* Reusable CI/CD framework
+* Improved scalability for organizations deploying multiple applications daily
+
+The framework can be reused across future projects to accelerate delivery while maintaining quality, security, and operational consistency.
