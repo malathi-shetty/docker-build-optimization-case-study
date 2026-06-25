@@ -43,7 +43,7 @@ pipeline {
                 sh '''
                 docker build \
                 -f Dockerfile.multistage \
-                -t ${IMAGE_NAME}:${VERSION} .
+                -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
             }
         }
@@ -121,6 +121,8 @@ pipeline {
 
                     sh '''
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+
+                    docker images | grep ${IMAGE_NAME}
 
                     docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_REPO}:${IMAGE_TAG}
 
