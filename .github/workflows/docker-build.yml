@@ -1,121 +1,121 @@
 name: Docker Build Optimization CI Pipeline
 
 on:
-push:
-branches:
-- main
+  push:
+    branches:
+      - main
 
-pull_request:
-branches:
-- main
+  pull_request:
+    branches:
+      - main
 
 permissions:
-contents: read
+  contents: read
 
 env:
-IMAGE_NAME: docker-build-github
-IMAGE_TAG: ${{ github.run_number }}
+  IMAGE_NAME: docker-build-github
+  IMAGE_TAG: ${{ github.run_number }}
 
 jobs:
-build:
-runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
 
-steps:
+    steps:
 
-  - name: Checkout Code
-    uses: actions/checkout@v4
-    with:
-      fetch-depth: 0
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-  - name: Setup Java
-    uses: actions/setup-java@v4
-    with:
-      distribution: temurin
-      java-version: '21'
-      cache: maven
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
 
-  - name: Build and Verify
-    run: |
-      cd app/build-optimization-demo
-      mvn clean verify
+      - name: Build and Verify
+        run: |
+          cd app/build-optimization-demo
+          mvn clean verify
 
-  - name: SonarCloud Scan
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-    run: |
-      cd app/build-optimization-demo
+      - name: SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          cd app/build-optimization-demo
 
-      mvn sonar:sonar \
-        -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
-        -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }} \
-        -Dsonar.host.url=https://sonarcloud.io \
-        -Dsonar.token=$SONAR_TOKEN
+          mvn sonar:sonar \
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=$SONAR_TOKEN
 
-  - name: SonarCloud Quality Gate
-    uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
-    with:
-      scanMetadataReportFile: app/build-optimization-demo/target/sonar/report-task.txt
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarCloud Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
+        with:
+          scanMetadataReportFile: app/build-optimization-demo/target/sonar/report-task.txt
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  - name: Build Docker Image
-    run: |
-      docker build \
-        -f Dockerfile.multistage \
-        -t $IMAGE_NAME:$IMAGE_TAG .
+      - name: Build Docker Image
+        run: |
+          docker build \
+            -f Dockerfile.multistage \
+            -t $IMAGE_NAME:$IMAGE_TAG .
 
-  - name: Trivy Security Scan
-    run: |
-      mkdir -p reports
+      - name: Trivy Security Scan
+        run: |
+          mkdir -p reports
 
-      docker run --rm \
-        -v /var/run/docker.sock:/var/run/docker.sock \
-        -v ${{ github.workspace }}/reports:/reports \
-        aquasec/trivy:latest image \
-        --severity HIGH,CRITICAL \
-        --format table \
-        -o /reports/trivy-report.txt \
-        $IMAGE_NAME:$IMAGE_TAG
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v ${{ github.workspace }}/reports:/reports \
+            aquasec/trivy:latest image \
+            --severity HIGH,CRITICAL \
+            --format table \
+            -o /reports/trivy-report.txt \
+            $IMAGE_NAME:$IMAGE_TAG
 
-  - name: Docker Login
-    env:
-      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-    run: |
-      echo "$DOCKERHUB_TOKEN" | docker login \
-        -u "$DOCKERHUB_USER" \
-        --password-stdin
+      - name: Docker Login
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          echo "$DOCKERHUB_TOKEN" | docker login \
+            -u "$DOCKERHUB_USER" \
+            --password-stdin
 
-  - name: Docker Push
-    env:
-      DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-    run: |
-      docker tag $IMAGE_NAME:$IMAGE_TAG \
-        $DOCKERHUB_USER/$IMAGE_NAME:$IMAGE_TAG
+      - name: Docker Push
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+        run: |
+          docker tag $IMAGE_NAME:$IMAGE_TAG \
+            $DOCKERHUB_USER/$IMAGE_NAME:$IMAGE_TAG
 
-      docker tag $IMAGE_NAME:$IMAGE_TAG \
-        $DOCKERHUB_USER/$IMAGE_NAME:latest
+          docker tag $IMAGE_NAME:$IMAGE_TAG \
+            $DOCKERHUB_USER/$IMAGE_NAME:latest
 
-      docker push \
-        $DOCKERHUB_USER/$IMAGE_NAME:$IMAGE_TAG
+          docker push \
+            $DOCKERHUB_USER/$IMAGE_NAME:$IMAGE_TAG
 
-      docker push \
-        $DOCKERHUB_USER/$IMAGE_NAME:latest
+          docker push \
+            $DOCKERHUB_USER/$IMAGE_NAME:latest
 
-  - name: Generate Report
-    run: |
-      mkdir -p reports
+      - name: Generate Report
+        run: |
+          mkdir -p reports
 
-      echo "Repository: $GITHUB_REPOSITORY" > reports/github-report.txt
-      echo "Workflow: $GITHUB_WORKFLOW" >> reports/github-report.txt
-      echo "Run Number: $GITHUB_RUN_NUMBER" >> reports/github-report.txt
-      echo "Commit SHA: $GITHUB_SHA" >> reports/github-report.txt
-      echo "Branch: $GITHUB_REF_NAME" >> reports/github-report.txt
-      echo "Date: $(date)" >> reports/github-report.txt
+          echo "Repository: $GITHUB_REPOSITORY" > reports/github-report.txt
+          echo "Workflow: $GITHUB_WORKFLOW" >> reports/github-report.txt
+          echo "Run Number: $GITHUB_RUN_NUMBER" >> reports/github-report.txt
+          echo "Commit SHA: $GITHUB_SHA" >> reports/github-report.txt
+          echo "Branch: $GITHUB_REF_NAME" >> reports/github-report.txt
+          echo "Date: $(date)" >> reports/github-report.txt
 
-  - name: Upload Reports
-    uses: actions/upload-artifact@v4
-    with:
-      name: reports
-      path: reports/
-      retention-days: 30
+      - name: Upload Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: reports/
+          retention-days: 30
