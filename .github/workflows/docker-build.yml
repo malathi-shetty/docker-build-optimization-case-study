@@ -132,9 +132,8 @@ jobs:
           if [ -z "$DOCKERHUB_USERNAME" ]; then
             echo "DOCKERHUB_USERNAME is EMPTY"
             exit 1
-          else
-            echo "DOCKERHUB_USERNAME is set"
           fi
+          echo "DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME"
 
       - name: Push Image
         env:
