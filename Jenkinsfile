@@ -37,7 +37,7 @@ stages {
     stage('SonarQube Analysis') {
         steps {
             dir('app/build-optimization-demo') {
-                withSonarQubeEnv('SonarQube') {
+                //withSonarQubeEnv('SonarQube') {
                     sh '''
                     mvn clean verify sonar:sonar \
                     -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study
@@ -78,11 +78,11 @@ stages {
         }
     }
 
-    stage('Start Nexus And Continue') {
-        steps {
-            input message: 'Start Nexus now and click Proceed'
-        }
-    }
+    //stage('Start Nexus And Continue') {
+        //steps {
+            //input message: 'Start Nexus now and click Proceed'
+        //}
+    //}
 
     stage('Deploy To Nexus') {
         steps {
