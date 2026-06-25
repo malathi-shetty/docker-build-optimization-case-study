@@ -127,16 +127,24 @@ pipeline {
         }
 
         stage('Deploy To Nexus') {
-            steps {
-                sh '''
-                cd app/build-optimization-demo
+    steps {
+        withCredentials([usernamePassword(
+            credentialsId: 'nexus-creds',
+            usernameVariable: 'NEXUS_USER',
+            passwordVariable: 'NEXUS_PASS'
+        )]) {
 
-                mvn deploy \
-                -DaltDeploymentRepository=nexus-releases::default::http://172.17.0.1:8082/repository/maven-releases/
-                '''
-            }
+            sh '''
+            cd app/build-optimization-demo
+
+            mvn deploy \
+            -Dnexus.username=$NEXUS_USER \
+            -Dnexus.password=$NEXUS_PASS \
+            -DaltDeploymentRepository=nexus-releases::default::http://172.17.0.1:8082/repository/maven-releases/
+            '''
         }
-
+    }
+}
         stage('Deploy To Tomcat') {
             steps {
                 sh '''
