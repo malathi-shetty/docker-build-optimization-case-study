@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class HelloServletTest {
@@ -20,8 +20,8 @@ class HelloServletTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
+        StringWriter sw = new StringWriter();
+        PrintWriter writer = new PrintWriter(sw);
 
         when(response.getWriter()).thenReturn(writer);
 
@@ -30,7 +30,7 @@ class HelloServletTest {
         writer.flush();
 
         verify(response).setContentType("text/plain");
-        assertTrue(stringWriter.toString().contains("Hello from Tomcat!"));
+        assertTrue(sw.toString().contains("Hello from Tomcat!"));
     }
 
     @Test
