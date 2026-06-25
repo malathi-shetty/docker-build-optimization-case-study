@@ -177,11 +177,11 @@ pipeline {
                   -o StrictHostKeyChecking=no \
                   $SSH_USER@172.31.44.114 "
 
-                    sudo mv /tmp/app.war /var/lib/tomcat10/webapps/ROOT.war
+                      sudo mv /tmp/app.war /var/lib/tomcat10/webapps/ROOT.war
 
-                    sudo systemctl restart tomcat10
+                      sudo systemctl restart tomcat10
 
-                    sudo systemctl status tomcat10 --no-pager
+                      
                   "
 
                 echo "Tomcat Deployment Done"
