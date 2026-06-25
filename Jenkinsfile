@@ -148,30 +148,47 @@ pipeline {
         }
     }
 }
-        stage('Deploy To Tomcat') {
-            steps {
-                sh '''
-                echo "Setting up SSH trust..."
+    stage('Deploy To Tomcat') {
+        steps {
 
+            withCredentials([
+                sshUserPrivateKey(
+                    credentialsId: 'tomcat-ssh-key',
+                    keyFileVariable: 'SSH_KEY',
+                    usernameVariable: 'SSH_USER'
+                )
+            ]) {
+
+                sh '''
                 mkdir -p ~/.ssh
 
                 ssh-keyscan -H 172.31.44.114 >> ~/.ssh/known_hosts
 
                 echo "Deploying WAR..."
 
-                scp -o StrictHostKeyChecking=no \
-                app/build-optimization-demo/target/*.war \
-                ubuntu@172.31.44.114:/tmp/app.war
+                scp \
+                  -i $SSH_KEY \
+                  -o StrictHostKeyChecking=no \
+                  app/build-optimization-demo/target/app.war \
+                  $SSH_USER@172.31.44.114:/tmp/app.war
 
-                ssh -o StrictHostKeyChecking=no ubuntu@172.31.44.114 "
+                ssh \
+                  -i $SSH_KEY \
+                  -o StrictHostKeyChecking=no \
+                  $SSH_USER@172.31.44.114 "
+
                     sudo mv /tmp/app.war /var/lib/tomcat10/webapps/ROOT.war
+
                     sudo systemctl restart tomcat10
-                "
+
+                    sudo systemctl status tomcat10 --no-pager
+                  "
 
                 echo "Tomcat Deployment Done"
                 '''
             }
         }
+    }
 
         stage('Generate Report') {
             steps {

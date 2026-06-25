@@ -6,10 +6,8 @@ COPY app/build-optimization-demo /app/build-optimization-demo
 
 RUN mvn -f /app/build-optimization-demo/pom.xml clean package -DskipTests
 
-
 FROM tomcat:10.1
 
-# COPY correct WAR (NO version guessing)
 COPY --from=builder \
 /app/build-optimization-demo/target/app.war \
 /usr/local/tomcat/webapps/ROOT.war
