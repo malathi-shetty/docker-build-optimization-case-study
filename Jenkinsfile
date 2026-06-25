@@ -5,17 +5,14 @@ pipeline {
         IMAGE_NAME = "docker-build-jenkins"
         IMAGE_TAG = "${BUILD_NUMBER}"
 
-        // 🔴 CHANGE THIS
         DOCKERHUB_REPO = "shettymalathi113/docker-build-jenkins"
 
         SONAR_ORG = "malathi-shetty"
         SONAR_PROJECT_KEY = "malathi-shetty_docker-build-optimization-case-study"
 
-        // 🔴 CHANGE THIS if Jenkins is NOT inside Docker network
-        NEXUS_URL = "http://nexus:8082"
+        // Nexus exposed on EC2 host
+        NEXUS_URL = "http://localhost:8082"
 
-        // 🔴 CHANGE THIS (your real server IP)
-        TOMCAT_SERVER = "ubuntu@35.92.84.93"
         TOMCAT_PATH = "/var/lib/tomcat10/webapps"
     }
 
@@ -27,7 +24,6 @@ pipeline {
             }
         }
 
-        //stage('Build Jar') {
         stage('Build War') {
             steps {
                 sh '''
@@ -38,28 +34,34 @@ pipeline {
             }
         }
 
-        // ================= BUILD DOCKER IMAGE FIRST =================
         stage('Build Docker Image') {
             steps {
                 sh '''
                 docker build \
-                -f Dockerfile.multistage \
-                -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                  -f Dockerfile.multistage \
+                  -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
             }
         }
 
-        // ================= PARALLEL SCANS =================
         stage('Code Quality & Security Scan') {
             steps {
                 script {
+
                     parallel(
 
-                        // ---------- SONAR ----------
                         "SonarCloud": {
-                            withCredentials([string(credentialsId: 'sonar-cloud-token', variable: 'SONAR_TOKEN')]) {
+
+                            withCredentials([
+                                string(
+                                    credentialsId: 'sonar-cloud-token',
+                                    variable: 'SONAR_TOKEN'
+                                )
+                            ]) {
+
                                 sh '''
                                 cd app/build-optimization-demo
+
                                 mvn clean verify sonar:sonar \
                                   -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                                   -Dsonar.organization=${SONAR_ORG} \
@@ -69,15 +71,15 @@ pipeline {
                             }
                         },
 
-                        // ---------- TRIVY ----------
                         "Trivy Scan": {
+
                             sh '''
                             docker run --rm \
-                            -v /var/run/docker.sock:/var/run/docker.sock \
-                            aquasec/trivy:latest image \
-                            --timeout 10m \
-                            --scanners vuln \
-                            ${IMAGE_NAME}:${IMAGE_TAG} || true
+                              -v /var/run/docker.sock:/var/run/docker.sock \
+                              aquasec/trivy:latest image \
+                              --timeout 10m \
+                              --scanners vuln \
+                              ${IMAGE_NAME}:${IMAGE_TAG} || true
                             '''
                         }
                     )
@@ -85,26 +87,34 @@ pipeline {
             }
         }
 
-        // ================= QUALITY GATE =================
         stage('Quality Gate') {
             steps {
-                withCredentials([string(credentialsId: 'sonar-cloud-token', variable: 'SONAR_TOKEN')]) {
+
+                withCredentials([
+                    string(
+                        credentialsId: 'sonar-cloud-token',
+                        variable: 'SONAR_TOKEN'
+                    )
+                ]) {
 
                     script {
+
                         timeout(time: 5, unit: 'MINUTES') {
 
                             def response = sh(
-                                script: """
-                                curl -s -u ${SONAR_TOKEN}: \
-                                "https://sonarcloud.io/api/qualitygates/project_status?projectKey=${SONAR_PROJECT_KEY}"
-                                """,
+                                script: '''
+                                curl -s -u $SONAR_TOKEN: \
+                                "https://sonarcloud.io/api/qualitygates/project_status?projectKey='${SONAR_PROJECT_KEY}'"
+                                ''',
                                 returnStdout: true
                             ).trim()
 
                             echo response
 
-                            if (!response.contains('"status":"OK"')) {
-                                error "❌ Quality Gate FAILED"
+                            def json = readJSON text: response
+
+                            if (json.projectStatus.status != "OK") {
+                                error("❌ Quality Gate FAILED")
                             }
 
                             echo "✅ Quality Gate PASSED"
@@ -114,49 +124,54 @@ pipeline {
             }
         }
 
-        // ================= DOCKER HUB PUSH =================
         stage('DockerHub Push') {
+
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
 
                     sh '''
                     echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
 
-                    docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOCKERHUB_REPO}:${IMAGE_TAG}
-                    docker push ${DOCKERHUB_REPO}:${IMAGE_TAG}
+                    docker tag ${IMAGE_NAME}:${IMAGE_TAG} \
+                        ${DOCKERHUB_REPO}:${IMAGE_TAG}
+
+                    docker push \
+                        ${DOCKERHUB_REPO}:${IMAGE_TAG}
                     '''
                 }
             }
         }
 
-        // ================= NEXUS DEPLOY =================
         stage('Deploy To Nexus') {
+
             steps {
+
                 sh '''
                 cd app/build-optimization-demo
 
-                if [[ "${IMAGE_TAG}" == *SNAPSHOT* ]]; then
-                    mvn deploy -DaltDeploymentRepository=nexus-snapshots::default::${NEXUS_URL}/repository/maven-snapshots/
-                else
-                    mvn deploy -DaltDeploymentRepository=nexus-releases::default::${NEXUS_URL}/repository/maven-releases/
-                fi
+                mvn deploy \
+                -DaltDeploymentRepository=nexus-releases::default::${NEXUS_URL}/repository/maven-releases/
                 '''
             }
         }
 
-        // ================= TOMCAT DEPLOY =================
         stage('Deploy To Tomcat') {
+
             steps {
+
                 sh '''
                 echo "Deploying WAR to Tomcat..."
 
                 sudo cp app/build-optimization-demo/target/*.war \
-        /var/lib/tomcat10/webapps/
- 
+                ${TOMCAT_PATH}/
+
                 sudo systemctl restart tomcat10
 
                 echo "Tomcat Deployment Done"
@@ -164,9 +179,10 @@ pipeline {
             }
         }
 
-        // ================= REPORT =================
         stage('Generate Report') {
+
             steps {
+
                 sh '''
                 mkdir -p reports
 
@@ -178,31 +194,34 @@ pipeline {
         }
     }
 
-    // ================= POST ACTIONS =================
     post {
 
         success {
+
             echo "PIPELINE SUCCESS"
 
             emailext(
                 subject: "SUCCESS: ${JOB_NAME} #${BUILD_NUMBER}",
-                body: "Build SUCCESS 🚀 Check Jenkins for details.",
+                body: "Build SUCCESS. Check Jenkins.",
                 to: "shettymalathi113@gmail.com"
             )
         }
 
         failure {
+
             echo "PIPELINE FAILED"
 
             emailext(
                 subject: "FAILED: ${JOB_NAME} #${BUILD_NUMBER}",
-                body: "Build FAILED ❌ Check console logs.",
+                body: "Build FAILED. Check Jenkins console.",
                 to: "shettymalathi113@gmail.com"
             )
         }
 
         always {
+
             archiveArtifacts artifacts: 'reports/*'
+
             cleanWs()
         }
     }
