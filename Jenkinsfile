@@ -33,7 +33,7 @@ pipeline {
                 sh '''
                 cd app/build-optimization-demo
                 mvn clean package
-                ls -lah app/build-optimization-demo/target
+                ls -lah target
                 '''
             }
         }
@@ -154,8 +154,8 @@ pipeline {
                 sh '''
                 echo "Deploying WAR to Tomcat..."
 
-                scp -o StrictHostKeyChecking=no \
-                app/build-optimization-demo/target/*.war \
+                cp app/build-optimization-demo/target/*.war \
+           /opt/tomcat/webapps/
                 ${TOMCAT_SERVER}:${TOMCAT_PATH}/
 
                 echo "Tomcat Deployment Done"
