@@ -95,12 +95,12 @@ deploy_nexus:
     - build_jar
 
   script:
-    - echo "Uploading WAR to Nexus..."
+    - echo "Uploading WAR to Nexus in target..."
     - ls -la app/build-optimization-demo/target
 
-    - curl -u "$NEXUS_USER:$NEXUS_PASSWORD"
-      --upload-file app/build-optimization-demo/target/build-optimization-demo-1.0-SNAPSHOT.war
-      http://35.92.84.93:8082/repository/maven-snapshots/com/demo/build-optimization-demo/1.0-SNAPSHOT/build-optimization-demo-1.0-SNAPSHOT.war
+    - curl -u "$NEXUS_USER:$NEXUS_PASSWORD" \
+      --upload-file app/build-optimization-demo/target/app.war \
+      http://35.92.84.93:8082/repository/maven-snapshots/com/demo/build-optimization-demo/1.0-SNAPSHOT/app.war
 
 # ---------------- DOCKER HUB PUSH ----------------
 dockerhub_push:
@@ -132,11 +132,11 @@ deploy_tomcat:
     - build_jar
 
   script:
-    - echo "Deploying WAR to Tomcat..."
+    - echo "Deploying WAR files to Tomcat..."
     - ls -la app/build-optimization-demo/target
 
-    - curl -u "admin:Admin@123"
-      -T app/build-optimization-demo/target/build-optimization-demo-1.0-SNAPSHOT.war
+    - curl -u "admin:Admin@123" \
+      -T app/build-optimization-demo/target/app.war \
       "http://35.92.84.93:8080/manager/text/deploy?path=/build-optimization-demo&update=true"
 
 # ---------------- REPORT ----------------
