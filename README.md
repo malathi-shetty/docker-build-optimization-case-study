@@ -238,6 +238,19 @@ Pipeline stages:
 | Artifact Management     | Manual        | Nexus Repository |
 | Deployment Process      | Manual        | CI/CD Driven     |
 
+
+
+## Technical Improvements
+
+- Docker image optimization implemented
+- Multi-stage builds introduced
+- CI/CD pipelines automated
+- SonarCloud quality gates integrated
+- Trivy security scanning automated
+- Nexus artifact repository configured
+- Docker Hub image publishing automated
+- Tomcat deployment automated
+
 ---
 
 # Docker Image Evolution
