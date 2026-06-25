@@ -15,7 +15,7 @@ pipeline {
         TOMCAT_SERVER = "ubuntu@172.31.44.114"
         TOMCAT_PATH = "/var/lib/tomcat10/webapps"
 
-        VERSION = "${BUILD_NUMBER}-${BUILD_ID}"
+        BUILD_VERSION = "1.0-${BUILD_NUMBER}"
     }
 
     stages {
@@ -139,10 +139,9 @@ pipeline {
                     sh '''
                     cd app/build-optimization-demo
 
-                    mvn deploy \
-                    --settings $MAVEN_SETTINGS \
+                    mvn clean deploy \
                     -DskipTests \
-                    -DaltDeploymentRepository=nexus-releases::default::http://172.17.0.1:8082/repository/maven-releases/ \
+                    --settings $MAVEN_SETTINGS
                     
                     '''
         }
