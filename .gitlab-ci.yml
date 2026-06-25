@@ -1,127 +1,97 @@
-name: Docker Build Optimization CI Pipeline
+stages:
+  - build
+  - sonar
+  - docker
+  - security
+  - report
 
-on:
-  push:
-    branches:
-      - main
+debug:
+  stage: build
+  image: alpine
 
-  pull_request:
-    branches:
-      - main
+  script:
+    - pwd
+    - ls -la
+    - find . -name pom.xml
 
-permissions:
-  contents: read
+variables:
+  IMAGE_NAME: "docker-build-gitlab"
+  IMAGE_TAG: "$CI_PIPELINE_IID"
+  DOCKER_TLS_CERTDIR: ""
 
-env:
-  IMAGE_NAME: docker-build-github
-  IMAGE_TAG: ${{ github.run_number }}
+build_jar:
+  stage: build
+  image: maven:3.9-eclipse-temurin-21
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+  script:
+    - cd app/build-optimization-demo
+    - mvn clean verify
 
-    steps:
+  artifacts:
+    paths:
+      - app/build-optimization-demo/target
+    expire_in: 90 days
 
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+sonarqube_scan:
+  stage: sonar
+  image: maven:3.9-eclipse-temurin-21
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
+  dependencies:
+    - build_jar
 
-      - name: Build and Verify
-        run: |
-          cd app/build-optimization-demo
-          mvn clean verify
+  script:
+    - cd app/build-optimization-demo
+    - mvn clean verify sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=$SONAR_TOKEN -Dsonar.java.binaries=target/classes
 
-      - name: SonarCloud Scan
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          cd app/build-optimization-demo
+build_docker:
+  stage: docker
+  image: docker:24
 
-          mvn sonar:sonar \
-            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
-            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }} \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=$SONAR_TOKEN
+  services:
+    - docker:dind
 
-      - name: SonarCloud Quality Gate
-        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
-        with:
-          scanMetadataReportFile: app/build-optimization-demo/target/sonar/report-task.txt
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  script:
+    - docker build -f Dockerfile.multistage -t $IMAGE_NAME:$IMAGE_TAG .
+    - docker save $IMAGE_NAME:$IMAGE_TAG -o image.tar
 
-      - name: Build Docker Image
-        run: |
-          docker build \
-            -f Dockerfile.multistage \
-            -t $IMAGE_NAME:$IMAGE_TAG .
+  artifacts:
+    paths:
+      - image.tar
 
-      - name: Trivy Security Scan
-        run: |
-          mkdir -p reports
+trivy_scan:
+  stage: security
+  image: docker:24
 
-          docker run --rm \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v ${{ github.workspace }}/reports:/reports \
-            aquasec/trivy:latest image \
-            --severity HIGH,CRITICAL \
-            --format table \
-            -o /reports/trivy-report.txt \
-            $IMAGE_NAME:$IMAGE_TAG
+  services:
+    - docker:dind
 
-      - name: Docker Login
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: |
-          echo "$DOCKERHUB_TOKEN" | docker login \
-            -u "$DOCKERHUB_USERNAME" \
-            --password-stdin
+  dependencies:
+    - build_docker
 
+  script:
+    - mkdir -p reports
+    - docker load -i image.tar
+    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/reports:/reports aquasec/trivy:latest image --timeout 15m --scanners vuln --format table -o /reports/trivy-report.txt $IMAGE_NAME:$IMAGE_TAG
+    - cat reports/trivy-report.txt
 
-      - name: Debug Docker Variables
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: |
-          echo "IMAGE_NAME=$IMAGE_NAME"
-          echo "IMAGE_TAG=$IMAGE_TAG"
-          echo "USER=$DOCKERHUB_USERNAME"
+  artifacts:
+    paths:
+      - reports/
 
-      - name: Docker Push
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-        run: |
-          docker tag $IMAGE_NAME:$IMAGE_TAG \
-            $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+generate_report:
+  stage: report
+  image: alpine:latest
 
-          docker tag $IMAGE_NAME:$IMAGE_TAG \
-            $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+  dependencies:
+    - trivy_scan
 
-          docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
-          docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+  script:
+    - mkdir -p reports
+    - echo "Pipeline ID = $CI_PIPELINE_ID" > reports/gitlab-report.txt
+    - echo "Project Name = $CI_PROJECT_NAME" >> reports/gitlab-report.txt
+    - echo "Commit SHA = $CI_COMMIT_SHA" >> reports/gitlab-report.txt
+    - cat reports/gitlab-report.txt
 
-      - name: Generate Report
-        run: |
-          mkdir -p reports
-
-          echo "Repository: $GITHUB_REPOSITORY" > reports/github-report.txt
-          echo "Workflow: $GITHUB_WORKFLOW" >> reports/github-report.txt
-          echo "Run Number: $GITHUB_RUN_NUMBER" >> reports/github-report.txt
-          echo "Commit SHA: $GITHUB_SHA" >> reports/github-report.txt
-          echo "Branch: $GITHUB_REF_NAME" >> reports/github-report.txt
-          echo "Date: $(date)" >> reports/github-report.txt
-
-      - name: Upload Reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: reports
-          path: reports/
-          retention-days: 30
+  artifacts:
+    paths:
+      - reports/
