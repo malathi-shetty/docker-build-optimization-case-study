@@ -27,11 +27,13 @@ pipeline {
             }
         }
 
-        stage('Build Jar') {
+        //stage('Build Jar') {
+        stage('Build War') {
             steps {
                 sh '''
                 cd app/build-optimization-demo
                 mvn clean package
+                ls -lah app/build-optimization-demo/target
                 '''
             }
         }
