@@ -17,11 +17,11 @@ env:
   IMAGE_TAG: ${{ github.run_number }}
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
@@ -34,7 +34,7 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Build and Test
+      - name: Build and Verify
         run: |
           cd app/build-optimization-demo
           mvn clean verify
@@ -44,18 +44,19 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           cd app/build-optimization-demo
+
           mvn sonar:sonar \
             -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }} \
             -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN
 
-      - name: Sonar Quality Gate
+      - name: SonarCloud Quality Gate
         uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           scanMetadataReportFile: app/build-optimization-demo/target/sonar/report-task.txt
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build Docker Image
         run: |
@@ -84,6 +85,15 @@ jobs:
           echo "$DOCKERHUB_TOKEN" | docker login \
             -u "$DOCKERHUB_USERNAME" \
             --password-stdin
+
+
+      - name: Debug Docker Variables
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          echo "IMAGE_NAME=$IMAGE_NAME"
+          echo "IMAGE_TAG=$IMAGE_TAG"
+          echo "USER=$DOCKERHUB_USERNAME"
 
       - name: Docker Push
         env:
