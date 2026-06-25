@@ -145,7 +145,6 @@ jobs:
           docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
           docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
 
-
 # ---------------- REPORT ----------------
   report:
     runs-on: ubuntu-latest
