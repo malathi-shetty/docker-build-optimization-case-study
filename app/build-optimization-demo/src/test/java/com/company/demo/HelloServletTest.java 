@@ -1,21 +1,16 @@
 package com.company.demo;
 
-import org.junit.jupiter.api.Test;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.Test;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class HelloServletTest {
-
-    @Test
-    void sampleTest() {
-        assertEquals("Hello", "Hello");
-    }
 
     @Test
     void doGetShouldReturnHelloMessage() throws Exception {
@@ -24,12 +19,32 @@ class HelloServletTest {
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        PrintWriter writer = mock(PrintWriter.class);
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
 
         when(response.getWriter()).thenReturn(writer);
 
         servlet.doGet(request, response);
 
-        verify(writer).println("Hello from Tomcat!");
+        writer.flush();
+
+        verify(response).setContentType("text/plain");
+        assertTrue(stringWriter.toString().contains("Hello from Tomcat!"));
+    }
+
+    @Test
+    void doGet_shouldHandleIOException_branch() throws Exception {
+
+        HelloServlet servlet = new HelloServlet();
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        when(response.getWriter()).thenThrow(new java.io.IOException("fail"));
+
+        servlet.doGet(request, response);
+
+        verify(response).setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 }
