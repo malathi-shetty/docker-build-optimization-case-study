@@ -57,3 +57,6 @@ temp/
 
 # Build caches
 .mvn/wrapper/maven-wrapper.jar
+
+
+settings.xml

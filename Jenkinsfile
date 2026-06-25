@@ -127,21 +127,16 @@ pipeline {
         }
 
         stage('Deploy To Nexus') {
-    steps {
-        withCredentials([usernamePassword(
-            credentialsId: 'nexus-creds',
-            usernameVariable: 'NEXUS_USER',
-            passwordVariable: 'NEXUS_PASS'
-        )]) {
+            steps {
+                withCredentials([file(credentialsId: 'maven-settings', variable: 'MAVEN_SETTINGS')]) {
 
-            sh '''
-            cd app/build-optimization-demo
+                    sh '''
+                    cd app/build-optimization-demo
 
-            mvn deploy \
-            -Dnexus.username=$NEXUS_USER \
-            -Dnexus.password=$NEXUS_PASS \
-            -DaltDeploymentRepository=nexus-releases::default::http://172.17.0.1:8082/repository/maven-releases/
-            '''
+                    mvn deploy \
+                    --settings $MAVEN_SETTINGS \
+                    -DaltDeploymentRepository=nexus-releases::default::http://172.17.0.1:8082/repository/maven-releases/
+                    '''
         }
     }
 }
@@ -177,7 +172,7 @@ pipeline {
     }
 
     post {
-
+/*
         success {
             echo "PIPELINE SUCCESS"
 
@@ -197,7 +192,7 @@ pipeline {
                 to: "shettymalathi113@gmail.com"
             )
         }
-
+*/
         always {
             archiveArtifacts artifacts: 'reports/*'
             cleanWs()
