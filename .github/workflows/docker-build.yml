@@ -86,21 +86,27 @@ jobs:
             -u "$DOCKERHUB_USERNAME" \
             --password-stdin
 
+
+      - name: Debug Docker Variables
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        run: |
+          echo "IMAGE_NAME=$IMAGE_NAME"
+          echo "IMAGE_TAG=$IMAGE_TAG"
+          echo "USER=$DOCKERHUB_USERNAME"
+
       - name: Docker Push
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
           docker tag $IMAGE_NAME:$IMAGE_TAG \
-            $DOCKERHUB_USERNAMENAME/$IMAGE_NAME:$IMAGE_TAG
+            $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
 
           docker tag $IMAGE_NAME:$IMAGE_TAG \
             $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
 
-          docker push \
-            $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
-
-          docker push \
-            $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+          docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
+          docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
 
       - name: Generate Report
         run: |
@@ -119,4 +125,3 @@ jobs:
           name: reports
           path: reports/
           retention-days: 30
-          
