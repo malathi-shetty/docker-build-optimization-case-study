@@ -18,9 +18,6 @@ env:
 
 jobs:
 
-# -------------------------
-# 1. BUILD + TEST + SONAR
-# -------------------------
   build:
     runs-on: ubuntu-latest
 
@@ -37,7 +34,7 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Build + Test
+      - name: Build and Test
         run: |
           cd app/build-optimization-demo
           mvn clean verify
@@ -53,24 +50,6 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=$SONAR_TOKEN
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: maven-build
-          path: app/build-optimization-demo/target
-
-
-# -------------------------
-# 2. QUALITY GATE (BLOCK PIPELINE IF FAIL)
-# -------------------------
-  quality_gate:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
       - name: Sonar Quality Gate
         uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
         env:
@@ -78,34 +57,13 @@ jobs:
         with:
           scanMetadataReportFile: app/build-optimization-demo/target/sonar/report-task.txt
 
-
-# -------------------------
-# 3. DOCKER BUILD
-# -------------------------
-  docker_build:
-    runs-on: ubuntu-latest
-    needs: quality_gate
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
       - name: Build Docker Image
         run: |
           docker build \
             -f Dockerfile.multistage \
             -t $IMAGE_NAME:$IMAGE_TAG .
 
-
-# -------------------------
-# 4. SECURITY SCAN (TRIVY)
-# -------------------------
-  security_scan:
-    runs-on: ubuntu-latest
-    needs: docker_build
-
-    steps:
-      - name: Trivy Scan
+      - name: Trivy Security Scan
         run: |
           mkdir -p reports
 
@@ -118,21 +76,6 @@ jobs:
             -o /reports/trivy-report.txt \
             $IMAGE_NAME:$IMAGE_TAG
 
-      - name: Upload Security Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-reports
-          path: reports/
-
-
-# -------------------------
-# 5. DOCKER PUSH
-# -------------------------
-  docker_push:
-    runs-on: ubuntu-latest
-    needs: security_scan
-
-    steps:
       - name: Docker Login
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -142,7 +85,7 @@ jobs:
             -u "$DOCKERHUB_USERNAME" \
             --password-stdin
 
-      - name: Push Docker Image
+      - name: Docker Push
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
@@ -155,15 +98,6 @@ jobs:
           docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
           docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
 
-
-# -------------------------
-# 6. REPORTING
-# -------------------------
-  report:
-    runs-on: ubuntu-latest
-    needs: docker_push
-
-    steps:
       - name: Generate Report
         run: |
           mkdir -p reports
