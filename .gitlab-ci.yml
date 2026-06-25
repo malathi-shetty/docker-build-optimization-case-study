@@ -3,7 +3,13 @@ stages:
   - sonar
   - docker
   - security
+  - push
   - report
+
+variables:
+  IMAGE_NAME: "docker-build-gitlab"
+  IMAGE_TAG: "$CI_PIPELINE_IID"
+  DOCKER_TLS_CERTDIR: ""
 
 debug:
   stage: build
@@ -13,11 +19,6 @@ debug:
     - pwd
     - ls -la
     - find . -name pom.xml
-
-variables:
-  IMAGE_NAME: "docker-build-gitlab"
-  IMAGE_TAG: "$CI_PIPELINE_IID"
-  DOCKER_TLS_CERTDIR: ""
 
 build_jar:
   stage: build
@@ -41,7 +42,12 @@ sonarqube_scan:
 
   script:
     - cd app/build-optimization-demo
-    - mvn clean verify sonar:sonar -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study -Dsonar.organization=malathi-shetty -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=$SONAR_TOKEN -Dsonar.java.binaries=target/classes
+    - mvn clean verify sonar:sonar \
+      -Dsonar.projectKey=malathi-shetty_docker-build-optimization-case-study \
+      -Dsonar.organization=malathi-shetty \
+      -Dsonar.host.url=https://sonarcloud.io \
+      -Dsonar.token=$SONAR_TOKEN \
+      -Dsonar.java.binaries=target/classes
 
 build_docker:
   stage: docker
@@ -71,12 +77,48 @@ trivy_scan:
   script:
     - mkdir -p reports
     - docker load -i image.tar
-    - docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd)/reports:/reports aquasec/trivy:latest image --timeout 15m --scanners vuln --format table -o /reports/trivy-report.txt $IMAGE_NAME:$IMAGE_TAG
+    - docker run --rm \
+      -v /var/run/docker.sock:/var/run/docker.sock \
+      -v $(pwd)/reports:/reports \
+      aquasec/trivy:latest image \
+      --timeout 15m \
+      --scanners vuln \
+      --format table \
+      -o /reports/trivy-report.txt \
+      $IMAGE_NAME:$IMAGE_TAG
+
     - cat reports/trivy-report.txt
 
   artifacts:
     paths:
       - reports/
+
+docker_push:
+  stage: push
+  image: docker:24
+
+  services:
+    - docker:dind
+
+  dependencies:
+    - build_docker
+
+  script:
+    - docker load -i image.tar
+
+    - echo "$DOCKER_PASS" | docker login \
+      -u "$DOCKER_USER" \
+      --password-stdin
+
+    - docker tag $IMAGE_NAME:$IMAGE_TAG \
+      $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG
+
+    - docker tag $IMAGE_NAME:$IMAGE_TAG \
+      $DOCKER_USER/$IMAGE_NAME:latest
+
+    - docker push $DOCKER_USER/$IMAGE_NAME:$IMAGE_TAG
+
+    - docker push $DOCKER_USER/$IMAGE_NAME:latest
 
 generate_report:
   stage: report
@@ -84,14 +126,20 @@ generate_report:
 
   dependencies:
     - trivy_scan
+    - docker_push
 
   script:
     - mkdir -p reports
+
     - echo "Pipeline ID = $CI_PIPELINE_ID" > reports/gitlab-report.txt
     - echo "Project Name = $CI_PROJECT_NAME" >> reports/gitlab-report.txt
     - echo "Commit SHA = $CI_COMMIT_SHA" >> reports/gitlab-report.txt
+    - echo "Branch = $CI_COMMIT_REF_NAME" >> reports/gitlab-report.txt
+    - echo "Date = $(date)" >> reports/gitlab-report.txt
+
     - cat reports/gitlab-report.txt
 
   artifacts:
     paths:
       - reports/
+    expire_in: 30 days
