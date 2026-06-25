@@ -1,0 +1,35 @@
+package com.company.demo;
+
+import org.junit.jupiter.api.Test;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.PrintWriter;
+
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+class HelloServletTest {
+
+    @Test
+    void sampleTest() {
+        assertEquals("Hello", "Hello");
+    }
+
+    @Test
+    void doGetShouldReturnHelloMessage() throws Exception {
+
+        HelloServlet servlet = new HelloServlet();
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        PrintWriter writer = mock(PrintWriter.class);
+
+        when(response.getWriter()).thenReturn(writer);
+
+        servlet.doGet(request, response);
+
+        verify(writer).println("Hello from Tomcat!");
+    }
+}
