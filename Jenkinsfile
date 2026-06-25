@@ -16,7 +16,7 @@ pipeline {
 
         // 🔴 CHANGE THIS (your real server IP)
         TOMCAT_SERVER = "ubuntu@35.92.84.93"
-        TOMCAT_PATH = "/opt/tomcat/webapps"
+        TOMCAT_PATH = "/var/lib/tomcat10/webapps"
     }
 
     stages {
@@ -154,9 +154,10 @@ pipeline {
                 sh '''
                 echo "Deploying WAR to Tomcat..."
 
-                cp app/build-optimization-demo/target/*.war \
-           /opt/tomcat/webapps/
-                ${TOMCAT_SERVER}:${TOMCAT_PATH}/
+                sudo cp app/build-optimization-demo/target/*.war \
+        /var/lib/tomcat10/webapps/
+ 
+                sudo systemctl restart tomcat10
 
                 echo "Tomcat Deployment Done"
                 '''
