@@ -58,7 +58,7 @@ stage('SonarCloud Analysis') {
 
             withCredentials([
                 string(
-                    credentialsId: 'sonarcloud-token',
+                    credentialsId: 'sonar-cloud-token',
                     variable: 'SONAR_TOKEN'
                 )
             ]) {
