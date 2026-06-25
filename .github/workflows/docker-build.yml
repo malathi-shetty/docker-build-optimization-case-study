@@ -79,28 +79,28 @@ jobs:
 
       - name: Docker Login
         env:
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
         run: |
           echo "$DOCKERHUB_TOKEN" | docker login \
-            -u "$DOCKERHUB_USER" \
+            -u "$DOCKERHUB_USERNAME" \
             --password-stdin
 
       - name: Docker Push
         env:
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
           docker tag $IMAGE_NAME:$IMAGE_TAG \
-            $DOCKERHUB_USER/$IMAGE_NAME:$IMAGE_TAG
+            $DOCKERHUB_USERNAMENAME/$IMAGE_NAME:$IMAGE_TAG
 
           docker tag $IMAGE_NAME:$IMAGE_TAG \
-            $DOCKERHUB_USER/$IMAGE_NAME:latest
+            $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
 
           docker push \
-            $DOCKERHUB_USER/$IMAGE_NAME:$IMAGE_TAG
+            $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
 
           docker push \
-            $DOCKERHUB_USER/$IMAGE_NAME:latest
+            $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
 
       - name: Generate Report
         run: |
