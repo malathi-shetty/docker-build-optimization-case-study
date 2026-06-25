@@ -5,7 +5,7 @@
 
   <groupId>com.company.demo</groupId>
   <artifactId>build-optimization-demo</artifactId>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
   <version>1.0-SNAPSHOT</version>
 
   <distributionManagement>
@@ -18,6 +18,8 @@
   <name>build-optimization-demo</name>
 
   <url>http://maven.apache.org</url>
+
+  
  
 <dependencies>
 

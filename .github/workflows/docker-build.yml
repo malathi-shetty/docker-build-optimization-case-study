@@ -99,6 +99,9 @@ jobs:
           --exit-code 1 \
           $IMAGE_NAME:$IMAGE_TAG
 
+
+      
+
       - name: Generate Report
         run: |
           mkdir -p reports
@@ -118,3 +121,17 @@ jobs:
           name: reports
           path: reports/
           retention-days: 30
+
+      - name: Docker Login
+  run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+
+- name: Docker Build
+  run: docker build -f Dockerfile.multistage -t $IMAGE_NAME:$IMAGE_TAG .
+
+- name: Docker Push
+  run: |
+    docker tag $IMAGE_NAME:$IMAGE_TAG ${{ secrets.DOCKERHUB_USER }}/$IMAGE_NAME:$IMAGE_TAG
+    docker tag $IMAGE_NAME:$IMAGE_TAG ${{ secrets.DOCKERHUB_USER }}/$IMAGE_NAME:latest
+
+    docker push ${{ secrets.DOCKERHUB_USER }}/$IMAGE_NAME:$IMAGE_TAG
+    docker push ${{ secrets.DOCKERHUB_USER }}/$IMAGE_NAME:latest
