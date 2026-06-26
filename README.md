@@ -891,7 +891,8 @@ The project successfully delivers all requested objectives from the case study.
 <img width="936" height="1680" alt="image" src="https://github.com/user-attachments/assets/ec8f584b-ba21-4a27-b4a2-1b42f0d5ba6f" />
 
 
-<img width="1871" height="840" alt="image" src="https://github.com/user-attachments/assets/193dd342-a8da-4672-8b0f-8c60d9a83c25" />
+<img width="1871" height="840" alt="image" src="https://github.com/user-attachments/assets/52abecac-12a3-499b-99cf-b9ba33c7881b" />
+
 
 
 ---
