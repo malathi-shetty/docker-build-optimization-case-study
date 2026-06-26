@@ -1,125 +1,370 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Docker Build Optimization Case Study</title>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        h1 {
-            color: #333;
-        }
+<title>Docker Build Optimization & DevSecOps CI/CD Case Study</title>
 
-        table {
-            border-collapse: collapse;
-            width: 80%;
-            margin-top: 20px;
-        }
+<style>
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f4f7fb;
+    color:#333;
+}
 
-        th {
-            background-color: #f4f4f4;
-        }
+header{
+    background:linear-gradient(90deg,#0f172a,#2563eb);
+    color:white;
+    text-align:center;
+    padding:40px;
+}
 
-        .success {
-            color: green;
-            font-weight: bold;
-        }
-    </style>
+header h1{
+    margin:0;
+    font-size:38px;
+}
+
+header p{
+    font-size:18px;
+}
+
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:auto;
+}
+
+.section{
+    background:white;
+    margin-top:25px;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+}
+
+.section h2{
+    color:#2563eb;
+}
+
+.badge{
+    display:inline-block;
+    padding:8px 14px;
+    margin:5px;
+    border-radius:20px;
+    color:white;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.java{background:#e63946;}
+.maven{background:#d90429;}
+.docker{background:#0284c7;}
+.jenkins{background:#d97706;}
+.github{background:#111827;}
+.gitlab{background:#f97316;}
+.sonar{background:#2563eb;}
+.trivy{background:#16a34a;}
+.nexus{background:#7c3aed;}
+.tomcat{background:#ca8a04;}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th{
+    background:#2563eb;
+    color:white;
+}
+
+th,td{
+    border:1px solid #ddd;
+    padding:12px;
+    text-align:center;
+}
+
+.success{
+    color:green;
+    font-weight:bold;
+}
+
+.links a{
+    display:block;
+    margin:10px 0;
+    color:#2563eb;
+    text-decoration:none;
+}
+
+.links a:hover{
+    text-decoration:underline;
+}
+
+footer{
+    margin-top:40px;
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    padding:20px;
+}
+
+.highlight{
+    background:#ecfeff;
+    border-left:5px solid #0891b2;
+    padding:15px;
+    margin-top:20px;
+}
+
+</style>
+
 </head>
 
 <body>
 
-<h1>Docker Build Optimization Case Study</h1>
+<header>
+
+<h1>🚀 Docker Build Optimization & DevSecOps CI/CD Case Study</h1>
 
 <p>
-This project demonstrates:
+Real-world DevOps project focused on Docker optimization, DevSecOps, and CI/CD automation.
+</p>
+
+</header>
+
+<div class="container">
+
+<div class="section">
+
+<h2>🛠 Technologies Used</h2>
+
+<span class="badge java">Java 21</span>
+<span class="badge maven">Maven</span>
+<span class="badge docker">Docker</span>
+<span class="badge jenkins">Jenkins</span>
+<span class="badge github">GitHub Actions</span>
+<span class="badge gitlab">GitLab CI/CD</span>
+<span class="badge sonar">SonarCloud</span>
+<span class="badge trivy">Trivy</span>
+<span class="badge nexus">Nexus</span>
+<span class="badge tomcat">Tomcat</span>
+
+</div>
+
+<div class="section">
+
+<h2>📖 Project Overview</h2>
+
+<p>
+
+This project started as a Docker Build Optimization challenge and evolved into a complete DevSecOps CI/CD implementation.
+
+Features include:
+
 </p>
 
 <ul>
-    <li>Maven Build Automation</li>
-    <li>Docker Multi-Stage Builds</li>
-    <li>Jenkins CI/CD</li>
-    <li>GitHub Actions</li>
-    <li>GitLab CI/CD</li>
-    <li>Automated Reporting</li>
+
+<li>Docker Multi-Stage Builds</li>
+
+<li>Docker Build Optimization</li>
+
+<li>Jenkins Pipeline</li>
+
+<li>GitHub Actions Workflow</li>
+
+<li>GitLab CI/CD Pipeline</li>
+
+<li>SonarCloud Code Analysis</li>
+
+<li>Trivy Security Scanning</li>
+
+<li>Nexus Artifact Repository</li>
+
+<li>Docker Hub Image Publishing</li>
+
+<li>Apache Tomcat Deployment</li>
+
 </ul>
 
-<h2>CI/CD Platforms</h2>
+</div>
+
+<div class="section">
+
+<h2>📊 Docker Image Optimization</h2>
 
 <table>
-    <tr>
-        <th>Platform</th>
-        <th>Status</th>
-    </tr>
 
-    <tr>
-        <td>Jenkins</td>
-        <td class="success">SUCCESS</td>
-    </tr>
+<tr>
+<th>Version</th>
+<th>Packaging</th>
+<th>Deployment</th>
+<th>Image Size</th>
+</tr>
 
-    <tr>
-        <td>GitHub Actions</td>
-        <td class="success">SUCCESS</td>
-    </tr>
+<tr>
+<td>V1</td>
+<td>JAR</td>
+<td>Standalone Java Runtime</td>
+<td>856 MB</td>
+</tr>
 
-    <tr>
-        <td>GitLab CI/CD</td>
-        <td class="success">SUCCESS</td>
-    </tr>
+<tr>
+<td>V2</td>
+<td>JAR</td>
+<td>Optimized Runtime</td>
+<td>454 MB</td>
+</tr>
+
+<tr>
+<td>V3</td>
+<td>WAR</td>
+<td>Apache Tomcat</td>
+<td>612 MB</td>
+</tr>
 
 </table>
 
-<h2>Docker Image Size Comparison</h2>
+<div class="highlight">
+
+<b>Image Reduction Achieved</b>
+
+<br><br>
+
+Single-stage Image : <b>856 MB</b>
+
+<br>
+
+Multi-stage Image : <b>612 MB</b>
+
+<br><br>
+
+<b>Overall Reduction: ~28.5%</b>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<h2>⚙ CI/CD Pipeline Status</h2>
 
 <table>
-    <tr>
-        <th>Image</th>
-        <th>Size</th>
-    </tr>
 
-    <tr>
-        <td>demo:v1</td>
-        <td>780 MB</td>
-    </tr>
+<tr>
 
-    <tr>
-        <td>demo:v2</td>
-        <td>430 MB</td>
-    </tr>
+<th>Platform</th>
 
-    <tr>
-        <td>demo:v3</td>
-        <td>220 MB</td>
-    </tr>
+<th>Status</th>
+
+</tr>
+
+<tr>
+
+<td>Jenkins</td>
+
+<td class="success">SUCCESS</td>
+
+</tr>
+
+<tr>
+
+<td>GitHub Actions</td>
+
+<td class="success">SUCCESS</td>
+
+</tr>
+
+<tr>
+
+<td>GitLab CI/CD</td>
+
+<td class="success">SUCCESS</td>
+
+</tr>
 
 </table>
 
-<h2>Generated Reports</h2>
+</div>
 
-<ul>
-    <li>jenkins-report.txt</li>
-    <li>github-report.txt</li>
-    <li>gitlab-report.txt</li>
-    <li>image-size-report.txt</li>
-</ul>
+<div class="section">
 
-<h2>Repository</h2>
+<h2>🔗 Project Links</h2>
 
-<p>
-GitHub Repository:
+<div class="links">
+
 <a href="https://github.com/malathi-shetty/docker-build-optimization-case-study">
-docker-build-optimization-case-study
+📂 GitHub Repository
 </a>
-</p>
+
+<a href="https://sonarcloud.io/project/overview?id=malathi-shetty_docker-build-optimization-case-study">
+📈 SonarCloud Dashboard
+</a>
+
+<a href="https://github.com/malathi-shetty/docker-build-optimization-case-study/actions/runs/28190607846">
+⚡ GitHub Actions Pipeline
+</a>
+
+<a href="https://gitlab.com/shettymalathi113/docker-build-optimization-case-study">
+🦊 GitLab Repository
+</a>
+
+<a href="https://hub.docker.com/repositories/shettymalathi113">
+🐳 Docker Hub
+</a>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<h2>🎯 Project Highlights</h2>
+
+<ul>
+
+<li>✅ Docker Build Optimization</li>
+
+<li>✅ Multi-Stage Docker Build</li>
+
+<li>✅ CI/CD using Jenkins</li>
+
+<li>✅ CI/CD using GitHub Actions</li>
+
+<li>✅ CI/CD using GitLab CI/CD</li>
+
+<li>✅ SonarCloud Integration</li>
+
+<li>✅ Trivy Vulnerability Scanning</li>
+
+<li>✅ Nexus Artifact Management</li>
+
+<li>✅ Docker Hub Image Publishing</li>
+
+<li>✅ Apache Tomcat Deployment</li>
+
+<li>✅ Enterprise WAR Deployment</li>
+
+</ul>
+
+</div>
+
+</div>
+
+<footer>
+
+Developed by <b>Malathi Shetty</b>
+
+<br><br>
+
+Docker Build Optimization & DevSecOps CI/CD Case Study
+
+</footer>
 
 </body>
+
 </html>
