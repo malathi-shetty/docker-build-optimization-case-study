@@ -11,6 +11,13 @@
 ![Nexus](https://img.shields.io/badge/Nexus-Artifacts-purple)
 ![Tomcat](https://img.shields.io/badge/Tomcat-Deployment-yellow)
 
+![CI](https://img.shields.io/badge/CI-Jenkins-red)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-Passing-success)
+![GitLab CI](https://img.shields.io/badge/GitLab_CI-Passing-success)
+![Docker Hub](https://img.shields.io/badge/DockerHub-Published-blue)
+![SonarCloud](https://img.shields.io/badge/SonarCloud-Passed-success)
+![Security](https://img.shields.io/badge/Trivy-Scanned-success)
+
 ---
 
 # Overview
