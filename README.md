@@ -17,6 +17,7 @@
 ![Docker Hub](https://img.shields.io/badge/DockerHub-Published-blue)
 ![SonarCloud](https://img.shields.io/badge/SonarCloud-Passed-success)
 ![Security](https://img.shields.io/badge/Trivy-Scanned-success)
+[![Live Demo](https://img.shields.io/badge/GitHub_Pages-Live-success)](https://malathi-shetty.github.io/docker-build-optimization-case-study/)
 
 ---
 
@@ -907,6 +908,7 @@ The project successfully delivers all requested objectives from the case study.
 | Docker Hub - Jenkins Image | https://hub.docker.com/repository/docker/shettymalathi113/docker-build-jenkins |
 | Docker Hub - GitHub Actions Image | https://hub.docker.com/repository/docker/shettymalathi113/docker-build-github |
 | Docker Hub - GitLab CI Image | https://hub.docker.com/repository/docker/shettymalathi113/docker-build-gitlab |
+| GitHub_Pages-Live-success | https://malathi-shetty.github.io/docker-build-optimization-case-study/ |
 
 ---
 
