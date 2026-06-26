@@ -1,125 +1,370 @@
+[![Live Demo](https://img.shields.io/badge/GitHub_Pages-Live-success)](https://malathi-shetty.github.io/docker-build-optimization-case-study/)
+
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Docker Build Optimization Case Study</title>
+    <meta charset="UTF-8">
+    <title>Docker Build Optimization & DevSecOps CI/CD Case Study</title>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
+
+        body{
+            font-family:Arial,Helvetica,sans-serif;
+            margin:40px;
+            background:#fafafa;
+            color:#333;
+            line-height:1.6;
         }
 
-        h1 {
-            color: #333;
+        h1{
+            color:#1f4e79;
         }
 
-        table {
-            border-collapse: collapse;
-            width: 80%;
-            margin-top: 20px;
+        h2{
+            margin-top:35px;
+            color:#1f4e79;
         }
 
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
+        table{
+            border-collapse:collapse;
+            width:90%;
+            margin-top:15px;
         }
 
-        th {
-            background-color: #f4f4f4;
+        th,td{
+            border:1px solid #ddd;
+            padding:10px;
+            text-align:left;
         }
 
-        .success {
-            color: green;
-            font-weight: bold;
+        th{
+            background:#f2f2f2;
         }
+
+        .success{
+            color:green;
+            font-weight:bold;
+        }
+
+        a{
+            color:#1565c0;
+            text-decoration:none;
+        }
+
+        a:hover{
+            text-decoration:underline;
+        }
+
     </style>
+
 </head>
 
 <body>
 
-<h1>Docker Build Optimization Case Study</h1>
+<h1>Docker Build Optimization & DevSecOps CI/CD Case Study</h1>
 
 <p>
-This project demonstrates:
+
+This project began as a Docker Build Optimization challenge and evolved into a complete DevSecOps CI/CD implementation.
+
+The solution demonstrates Docker optimization, automated CI/CD pipelines, code quality analysis, security scanning, artifact management, container registry publishing, and enterprise application deployment.
+
 </p>
 
+<hr>
+
+<h2>Project Highlights</h2>
+
 <ul>
-    <li>Maven Build Automation</li>
-    <li>Docker Multi-Stage Builds</li>
-    <li>Jenkins CI/CD</li>
-    <li>GitHub Actions</li>
-    <li>GitLab CI/CD</li>
-    <li>Automated Reporting</li>
+
+<li>Docker Image Optimization</li>
+
+<li>Docker Multi-Stage Builds</li>
+
+<li>Docker BuildKit</li>
+
+<li>Docker Compose</li>
+
+<li>Jenkins CI/CD Pipeline</li>
+
+<li>GitHub Actions Workflow</li>
+
+<li>GitLab CI/CD Pipeline</li>
+
+<li>SonarCloud Code Quality Analysis</li>
+
+<li>Trivy Security Scanning</li>
+
+<li>Nexus Artifact Repository</li>
+
+<li>Docker Hub Image Publishing</li>
+
+<li>Apache Tomcat Deployment</li>
+
+<li>WAR Based Enterprise Deployment</li>
+
 </ul>
+
+<hr>
 
 <h2>CI/CD Platforms</h2>
 
 <table>
-    <tr>
-        <th>Platform</th>
-        <th>Status</th>
-    </tr>
 
-    <tr>
-        <td>Jenkins</td>
-        <td class="success">SUCCESS</td>
-    </tr>
+<tr>
 
-    <tr>
-        <td>GitHub Actions</td>
-        <td class="success">SUCCESS</td>
-    </tr>
+<th>Platform</th>
 
-    <tr>
-        <td>GitLab CI/CD</td>
-        <td class="success">SUCCESS</td>
-    </tr>
+<th>Status</th>
+
+</tr>
+
+<tr>
+
+<td>Jenkins Pipeline</td>
+
+<td class="success">SUCCESS</td>
+
+</tr>
+
+<tr>
+
+<td>GitHub Actions</td>
+
+<td class="success">SUCCESS</td>
+
+</tr>
+
+<tr>
+
+<td>GitLab CI/CD</td>
+
+<td class="success">SUCCESS</td>
+
+</tr>
 
 </table>
 
-<h2>Docker Image Size Comparison</h2>
+<hr>
+
+<h2>Docker Image Evolution</h2>
 
 <table>
-    <tr>
-        <th>Image</th>
-        <th>Size</th>
-    </tr>
 
-    <tr>
-        <td>demo:v1</td>
-        <td>780 MB</td>
-    </tr>
+<tr>
 
-    <tr>
-        <td>demo:v2</td>
-        <td>430 MB</td>
-    </tr>
+<th>Version</th>
 
-    <tr>
-        <td>demo:v3</td>
-        <td>220 MB</td>
-    </tr>
+<th>Packaging</th>
+
+<th>Image Size</th>
+
+</tr>
+
+<tr>
+
+<td>Dockerfile.v1</td>
+
+<td>JAR</td>
+
+<td>856 MB</td>
+
+</tr>
+
+<tr>
+
+<td>Dockerfile.v2</td>
+
+<td>JAR</td>
+
+<td>454 MB</td>
+
+</tr>
+
+<tr>
+
+<td>Dockerfile.multistage</td>
+
+<td>WAR (Tomcat)</td>
+
+<td>612 MB</td>
+
+</tr>
 
 </table>
 
-<h2>Generated Reports</h2>
+<p>
+
+<b>Overall Docker Image Reduction (V1 → Multi-Stage):</b>
+
+<b style="color:green;">28.5%</b>
+
+</p>
+
+<hr>
+
+<h2>DevSecOps Pipeline</h2>
+
+<pre>
+
+Developer
+      │
+      ▼
+
+GitHub / GitLab
+
+      │
+      ▼
+
+Jenkins / GitHub Actions / GitLab CI
+
+      │
+      ▼
+
+Maven Build
+
+      │
+      ▼
+
+SonarCloud
+
+      │
+      ▼
+
+Docker Build
+
+      │
+      ▼
+
+Trivy Scan
+
+      │
+      ▼
+
+Nexus Repository
+
+      │
+      ▼
+
+Docker Hub
+
+      │
+      ▼
+
+Apache Tomcat
+
+      │
+      ▼
+
+Application Deployment
+
+</pre>
+
+<hr>
+
+<h2>Technologies Used</h2>
 
 <ul>
-    <li>jenkins-report.txt</li>
-    <li>github-report.txt</li>
-    <li>gitlab-report.txt</li>
-    <li>image-size-report.txt</li>
+
+<li>Java 21</li>
+
+<li>Spring Boot</li>
+
+<li>Maven</li>
+
+<li>Docker</li>
+
+<li>Docker Compose</li>
+
+<li>Docker BuildKit</li>
+
+<li>Jenkins</li>
+
+<li>GitHub Actions</li>
+
+<li>GitLab CI/CD</li>
+
+<li>SonarCloud</li>
+
+<li>Trivy</li>
+
+<li>Nexus Repository</li>
+
+<li>Docker Hub</li>
+
+<li>Apache Tomcat</li>
+
 </ul>
 
-<h2>Repository</h2>
+<hr>
+
+<h2>Project Links</h2>
+
+<ul>
+
+<li><b>GitHub Repository</b><br>
+<a href="https://github.com/malathi-shetty/docker-build-optimization-case-study">
+https://github.com/malathi-shetty/docker-build-optimization-case-study
+</a>
+</li>
+
+<br>
+
+<li><b>GitHub Actions</b><br>
+<a href="https://github.com/malathi-shetty/docker-build-optimization-case-study/actions">
+https://github.com/malathi-shetty/docker-build-optimization-case-study/actions
+</a>
+</li>
+
+<br>
+
+<li><b>GitLab Repository</b><br>
+<a href="https://gitlab.com/shettymalathi113/docker-build-optimization-case-study">
+https://gitlab.com/shettymalathi113/docker-build-optimization-case-study
+</a>
+</li>
+
+<br>
+
+<li><b>SonarCloud Dashboard</b><br>
+<a href="https://sonarcloud.io/project/overview?id=malathi-shetty_docker-build-optimization-case-study">
+https://sonarcloud.io/project/overview?id=malathi-shetty_docker-build-optimization-case-study
+</a>
+</li>
+
+<br>
+
+<li><b>Docker Hub</b><br>
+<a href="https://hub.docker.com/u/shettymalathi113">
+https://hub.docker.com/u/shettymalathi113
+</a>
+</li>
+
+</ul>
+
+<hr>
+
+<h2>Business Impact</h2>
 
 <p>
-GitHub Repository:
-<a href="https://github.com/malathi-shetty/docker-build-optimization-case-study">
-docker-build-optimization-case-study
-</a>
+
+This project demonstrates how Docker optimization can be combined with DevSecOps practices to automate software delivery.
+
+The implementation improves deployment consistency, automates quality and security validation, centralizes artifact management, and provides reusable CI/CD pipelines for enterprise applications.
+
+</p>
+
+<hr>
+
+<p>
+
+<b>Developed by:</b> Malathi Shetty
+
 </p>
 
 </body>
+
 </html>
+
