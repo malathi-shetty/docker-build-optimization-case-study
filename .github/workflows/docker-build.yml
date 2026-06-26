@@ -47,7 +47,7 @@ jobs:
           path: app/build-optimization-demo/target
 
 
-# ---------------- DOCKER BUILD ----------------
+# ---------------- DOCKER BUILD -----------------
   docker:
     runs-on: ubuntu-latest
     needs: build
