@@ -895,6 +895,21 @@ The project successfully delivers all requested objectives from the case study.
 
 ---
 
+# Live Project Links
+
+| Resource | Link |
+|----------|------|
+| GitHub Repository | https://github.com/malathi-shetty/docker-build-optimization-case-study |
+| GitHub Actions Pipeline | https://github.com/malathi-shetty/docker-build-optimization-case-study/actions/runs/28190607846 |
+| GitLab Repository | https://gitlab.com/shettymalathi113/docker-build-optimization-case-study |
+| GitLab Pipeline | https://gitlab.com/shettymalathi113/docker-build-optimization-case-study/-/pipelines/2629704445 |
+| SonarCloud Dashboard | https://sonarcloud.io/project/overview?id=malathi-shetty_docker-build-optimization-case-study |
+| Docker Hub - Jenkins Image | https://hub.docker.com/repository/docker/shettymalathi113/docker-build-jenkins |
+| Docker Hub - GitHub Actions Image | https://hub.docker.com/repository/docker/shettymalathi113/docker-build-github |
+| Docker Hub - GitLab CI Image | https://hub.docker.com/repository/docker/shettymalathi113/docker-build-gitlab |
+
+---
+
 # Technologies Used
 
 ## Programming Language
@@ -940,20 +955,7 @@ The project successfully delivers all requested objectives from the case study.
 
 ---
 
-# Live Project Links
 
-| Resource | Link |
-|----------|------|
-| GitHub Repository | https://github.com/malathi-shetty/docker-build-optimization-case-study |
-| GitHub Actions Pipeline | https://github.com/malathi-shetty/docker-build-optimization-case-study/actions/runs/28190607846 |
-| GitLab Repository | https://gitlab.com/shettymalathi113/docker-build-optimization-case-study |
-| GitLab Pipeline | https://gitlab.com/shettymalathi113/docker-build-optimization-case-study/-/pipelines/2629704445 |
-| SonarCloud Dashboard | https://sonarcloud.io/project/overview?id=malathi-shetty_docker-build-optimization-case-study |
-| Docker Hub - Jenkins Image | https://hub.docker.com/repository/docker/shettymalathi113/docker-build-jenkins |
-| Docker Hub - GitHub Actions Image | https://hub.docker.com/repository/docker/shettymalathi113/docker-build-github |
-| Docker Hub - GitLab CI Image | https://hub.docker.com/repository/docker/shettymalathi113/docker-build-gitlab |
-
----
 
 # Key Learnings
 
