@@ -330,3 +330,8 @@ Benefits achieved:
 * Improved scalability for organizations deploying multiple applications daily
 
 The framework can be reused across future projects to accelerate delivery while maintaining quality, security, and operational consistency.
+
+---
+
+<img width="1871" height="840" alt="image" src="https://github.com/user-attachments/assets/33dc07d1-eb38-428f-a0db-498fa80e97c3" />
+
